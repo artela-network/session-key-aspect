@@ -4,20 +4,23 @@
 
 Session keys are able to **stand in for** EoA private key to sign a **specific transaction**. These keys will automatically expire at the block height, which is set by EoA. They are also limited to sign specific transactions, calling only specific smart contract methods.
 
-
+**With Session-Key Aspect, you can enable following features for your dApp:**
+* Enable On-Click-Trading for defi protocol
+* Improve UX and wallet security for mini web app (like PWA, bot and TWA in Telegram)
+* Use your dApp like web2 products: login once, and click without interacting with the wallet
 
 # Project Intro
 
-* Folder 'aspect' implements the session key Aspect; check inside README.md to learn more.
-* Folder 'js_client' implements the session key Aspect javascript client; check inside README.md to learn more.
+* Folder [aspect](https://github.com/artela-network/session-key-aspect/blob/main/aspect/README.md) implements the session key Aspect;
+* Folder [js_client](https://github.com/artela-network/session-key-aspect/blob/main/js_client/README.md) implements the session key Aspect javascript client.
 
 
 
-# Overview
+# Session-key Overview
 
 ## 1. EoA binding session key to Aspect
 
-![截屏2023-11-09 15.37.26.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/45baf4ea-5aba-4e9d-b5e7-ca59d97ab79a/69d5f4e9-3cdc-49e3-9a33-01a03e2a13b5/%E6%88%AA%E5%B1%8F2023-11-09_15.37.26.png)
+![截屏2023-11-09 15.37.26.png](https://github.com/artela-network/session-key-aspect/blob/main/img/2023-11-09-15.37.26.png)
 
 
 
@@ -31,7 +34,7 @@ Additional info:
 
 ## 2. Use session key to sign transaction
 
-![截屏2023-11-09 15.32.38.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/45baf4ea-5aba-4e9d-b5e7-ca59d97ab79a/5517c913-ca58-4efe-bf20-7f2a60938518/%E6%88%AA%E5%B1%8F2023-11-09_15.32.38.png)
+![截屏2023-11-09 15.32.38.png](https://github.com/artela-network/session-key-aspect/blob/main/img/2023-11-09-15.32.38.png)
 
 Additional info :
 
@@ -43,7 +46,7 @@ Additional info :
 
 ## 3. Artela verify the transaction
 
-![截屏2023-11-09 15.52.20.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/45baf4ea-5aba-4e9d-b5e7-ca59d97ab79a/a3fcaff8-d654-4da5-9fd4-26c551c0746f/%E6%88%AA%E5%B1%8F2023-11-09_15.52.20.png)
+![截屏2023-11-09 15.52.20.png](https://github.com/artela-network/session-key-aspect/blob/main/img/2023-11-09-15.52.20.png)
 
 Additional info
 
@@ -53,7 +56,7 @@ Additional info
 
 ## 4. Call contract
 
-![截屏2023-11-09 15.54.18.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/45baf4ea-5aba-4e9d-b5e7-ca59d97ab79a/69809dc6-940a-47c1-89a1-f575f61c66b2/%E6%88%AA%E5%B1%8F2023-11-09_15.54.18.png)
+![截屏2023-11-09 15.54.18.png](https://github.com/artela-network/session-key-aspect/blob/main/img/2023-11-09-15.54.18.png)
 
 Additional info
 
@@ -65,13 +68,14 @@ Additional info
 
 # Implements
 
-Session-key Aspect project contains two components.
+Session-key Aspect project contains three components.
 
 - **Client**, `sessioin-key-aspect.js`, a client for the dApp front end to use session key.
 - **Aspect**, wasm bytecode deployed on Artela
 - **Explorer,** extend Artela explorer to show Aspect info
 
-![截屏2023-11-09 16.16.17.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/45baf4ea-5aba-4e9d-b5e7-ca59d97ab79a/1d227761-7333-4f90-a6b4-5ce99ee274fd/%E6%88%AA%E5%B1%8F2023-11-09_16.16.17.png)
+
+![截屏2023-11-09 16.16.17.png](https://github.com/artela-network/session-key-aspect/blob/main/img/2023-11-09-16.16.17.png)
 
 
 
