@@ -83,7 +83,7 @@ The script will run the test in the folder `tests`; you can run the specific cas
 
 ## Usage Testnet Session-key Aspect
 
-#### **Session-key Aspect address (testnet) ** 
+#### **Session-key Aspect address (testnet)** 
 
 lastest version: 0x40a908F327B22922983061E9E6a87e785d6401BB
 
@@ -99,10 +99,10 @@ If a smart contract wants to bind any Aspect, it **MUST** implement the [isOwner
 
 #### **Bind Aspect**
 
-There are three ways to bind Aspects:
+There are two ways to bind Aspects:
 
-* Use `artela-web3.js` to call Aspect system contract
 * Use `Aspect-tool` console command
+* Use `artela-web3.js` to call Aspect system contract
 
 
 
