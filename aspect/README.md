@@ -81,7 +81,7 @@ The script will run the test in the folder `tests`; you can run the specific cas
 
 
 
-## Usage Testnet Session-key Aspect
+## Testnet Session-key Aspect Usage
 
 #### **Session-key Aspect address (testnet)** 
 
