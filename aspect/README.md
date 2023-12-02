@@ -81,3 +81,105 @@ The script will run the test in the folder `tests`; you can run the specific cas
 
 
 
+## Usage Testnet Session-key Aspect
+
+#### **Session-key Aspect address (testnet) ** 
+
+lastest version: 0x40a908F327B22922983061E9E6a87e785d6401BB
+
+
+
+#### **Requirement**
+
+The smart contract needs to bind this Aspect to enable the session key feature for its users.
+
+If a smart contract wants to bind any Aspect, it **MUST** implement the [isOwner(address) ](https://docs.artela.network/develop/core-concepts/binding#contract-ownership-verification) method. Only the owner wallet can sign the binding transaction for its smart contract.
+
+
+
+#### **Bind Aspect**
+
+There are three ways to bind Aspects:
+
+* Use `artela-web3.js` to call Aspect system contract
+* Use `Aspect-tool` console command
+
+
+
+#### **Use Aspect-tool**
+
+In this way, you can bind Aspect by console command.
+
+Step 1: install [aspect-tool](https://docs.artela.network/develop/reference/aspect-tool/overview)
+
+```shell
+npm install @artela/aspect-tool -g
+```
+
+Step 2: init a empty project
+
+```shell
+mkdir empty-aspect && cd empty-aspect
+aspect-tool init
+npm install yargs
+```
+
+Step 3: use the script in this project
+
+```shell
+  npm run contract:bind -- --pkfile {smart-contract-owner-privateKey-path} --contract {smart-contract-address} --abi {smart-contract-abi-path} --aspectId '0x40a908F327B22922983061E9E6a87e785d6401BB' --gas '800000'
+```
+
+Learn more detailed steps in this [guide](https://docs.artela.network/develop/reference/aspect-tool/bind-aspect).
+
+
+
+#### Use artela-web3.js
+
+In this way, you need to write js script. Follow this [guide](https://docs.artela.network/develop/client/artela-web3.js#web3ethcontractbind) to bind your smart contract to Aspect by using `web3.js` in js.
+
+Here are brief steps:
+
+1. using your `contract address` and `abi` construct a contract object by `web3.eth.contract` 
+2. using `web3.eth.contract.bind(options, callback)` to send tx to bind specific Aspect
+
+Example:
+
+```js
+await contract.bind({
+        priority: 1,             // <-- Priority of the aspect, int8 number, smaller number has higher priority. Aspect with higher priority will be executed first.
+        aspectId: "0xABCD....ABCD", // <-- address of the aspect to bind with the contract, eg. 
+        aspectVersion: 1,        // <-- Version of the aspect to bind with the contract
+    }).send({ from: accounts[0], nonce, ...sendOptions });
+```
+
+Learn more detailed steps in this [guide](https://docs.artela.network/develop/client/artela-web3.js#web3ethcontractbind).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
