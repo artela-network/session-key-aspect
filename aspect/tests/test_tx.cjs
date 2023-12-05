@@ -284,12 +284,16 @@ async function f() {
     //     32 bytes: r
     //     32 bytes: s
     //     1 bytes: v
-    let validationData = mainKey + rmPrefix(signedTx.r) + rmPrefix(signedTx.s) + rmPrefix(getOriginalV(signedTx.v, chainId));
+    let validationData = "0x" + mainKey + rmPrefix(signedTx.r) + rmPrefix(signedTx.s) + rmPrefix(getOriginalV(signedTx.v, chainId));
 
     console.log("validationData : ", validationData);
     console.log("contractCallData : ", contractCallData);
     let encodedData = web3.eth.abi.encodeParameters(['bytes', 'bytes'],
-        ["0x" + validationData, contractCallData]);
+        [validationData, contractCallData]);
+
+    // new calldata: magic prefix + checksum(encodedData) + encodedData(validation data + raw calldata)
+    // 0xCAFECAFE is a magic prefix, 
+    encodedData = '0xCAFECAFE' + web3.utils.keccak256(encodedData).slice(2, 10) + encodedData.slice(2);
 
     tx = {
         from: sKeyAccount.address,

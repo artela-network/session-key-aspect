@@ -85,7 +85,7 @@ The script will run the test in the folder `tests`; you can run the specific cas
 
 #### **Session-key Aspect address (testnet)** 
 
-lastest version: 0x40a908F327B22922983061E9E6a87e785d6401BB
+lastest version: 0x1764EDEDC9FE1688a6E095803e39f334167DC148
 
 
 
