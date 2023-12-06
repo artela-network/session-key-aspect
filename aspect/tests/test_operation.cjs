@@ -79,11 +79,16 @@ async function testRegisterSessionKey() {
 
     printTestCase("testRegisterSessionKey: success");
 
+    let currentBlockHeight = await web3.eth.getBlockNumber();
+    let expireBlockHeight = currentBlockHeight + 20;
+    
     let op = "0x0001";
     let params =
         sKey
         + contract
-        + "0002" + method1 + method2;
+        + "0002" + method1 + method2
+        + web3.eth.abi.encodeParameter('uint256', expireBlockHeight).slice(48, 64);
+        ;
 
     console.log("op: ", op);
     console.log("params: ", params);

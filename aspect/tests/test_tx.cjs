@@ -184,8 +184,16 @@ async function f() {
         "// test registerSessionKey    \n" +
         "// ******************************************\n\n");
 
-    // let op = "0x0001" + sKey + sKeyContract + "0001" + contractCallMethod;
-    let op = "0x0001" + sKey + sKeyContract + "0003" + contractCallMethod + "d0e30db0" + "2e1a7d4d";
+    let currentBlockHeight = await web3.eth.getBlockNumber();
+    let expireBlockHeight = currentBlockHeight + 20; // ~10s
+
+    // let op = "0x0001" + sKey + sKeyContract + "0001" + contractCallMethod + expireBlockHeight;
+    let op =
+        "0x0001"
+        + sKey
+        + sKeyContract
+        + "0001" + contractCallMethod
+        + web3.eth.abi.encodeParameter('uint256', expireBlockHeight).slice(48, 64);
     let sessionKeyRegData = aspect.operation(op).encodeABI();
     console.log("op: ", op);
     console.log("calldata: ", sessionKeyRegData);

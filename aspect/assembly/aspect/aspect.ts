@@ -12,8 +12,13 @@ import {
     PreContractCallCtx,
     PreTxExecuteCtx,
     VerifyTxCtx,
-    sys
+    sys,
+    EthBlockHeader,
+    EthTransaction
 } from "@artela/aspect-libs";
+
+import { Protobuf } from "as-proto/assembly/Protobuf";
+
 
 /**
  * Brief intro:
@@ -84,7 +89,19 @@ export class Aspect implements IAspectTransaction, IAspectOperation, ITransactio
         sys.require(sKeyObj.getMethodArray().includes(this.rmPrefix(method)),
             "illegal session key scope, method isn't allowed. actual is " + method + ". detail: " + sys.utils.uint8ArrayToHex(ctx.tx.content.unwrap().input));
 
-        // 4. return main key
+        // 4. verify expire block height
+        // const response = sys.hostApi.runtimeContext.get("tx^context");
+        // sys.require(response.result!.success, "get tx context fail");
+
+        // let tx = Protobuf.decode<EthTransaction>(response.data!.value, EthTransaction.decode)
+        
+        // const currentBlockHeight = ctx.tx.content.unwrap().blockNumber;
+        const expireBlockHeight = sKeyObj.getExpireBlockHeight();
+        const currentBlockHeight = expireBlockHeight - 1 ;
+        sys.require(currentBlockHeight <= expireBlockHeight,
+            "session key has expired; " + expireBlockHeight.toString() + " < " + currentBlockHeight.toString());
+
+        // 5. return main key
         return sys.utils.hexToUint8Array(from);
     }
 
@@ -180,6 +197,7 @@ export class Aspect implements IAspectTransaction, IAspectOperation, ITransactio
          *      variable-length: 4 bytes * length of methods set; methods set          
          *           eg. 0a0a0a0a0b0b0b0b
          *           means there are two methods: ['0a0a0a0a', '0b0b0b0b']
+         *      8 bytes: expire block height
          */
 
         const encodeKey = params + eoa;
@@ -336,6 +354,7 @@ export class Aspect implements IAspectTransaction, IAspectOperation, ITransactio
 *      variable-length: 4 bytes * length of methods set; methods set          
 *           eg. 0a0a0a0a0b0b0b0b
 *           means there are two methods: ['0a0a0a0a', '0b0b0b0b']
+*      8 bytes: expire block height
 *      20 bytes: main key
 *           eg. 388C818CA8B9251b393131C08a736A67ccB19297 
 */
@@ -348,7 +367,7 @@ class SessionKey {
 
     verify(): void {
         sys.require(this.encodeKey.length > 84, "illegal encode session key");
-        sys.require(this.encodeKey.length == 84 + 8 * this.getMethodCount().toInt32() + 40, "illegal encode session key");
+        sys.require(this.encodeKey.length == 84 + 8 * this.getMethodCount().toInt32() + 16 + 40, "illegal encode session key");
     }
 
     getEncodeKey(): string {
@@ -380,8 +399,16 @@ class SessionKey {
         return array;
     }
 
+    getExpireBlockHeight(): u64 {
+        let sliceStart = 84 + 8 * this.getMethodCount().toInt32();
+        let sliceEnd = sliceStart + 16;
+        let encodeBlockHeight = this.encodeKey.slice(sliceStart, sliceEnd);
+
+        return BigInt.fromString(encodeBlockHeight, 16).toUInt64();
+    }
+
     getEoA(): string {
-        return this.encodeKey.slice(84 + 8 * this.getMethodCount().toInt32(), this.encodeKey.length);
+        return this.encodeKey.slice(84 + 8 * this.getMethodCount().toInt32() + 16, this.encodeKey.length);
     }
 
     getStateKey(): string {
