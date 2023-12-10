@@ -1,0 +1,28 @@
+{
+  "name": "sessioin-key-aspect-client",
+  "version": "1.0.0",
+  "description": "session key aspect client that provides session key management functionality",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/artela-network/session-key-aspect.git"
+  },
+  "keywords": [
+    "artela",
+    "session",
+    "key",
+    "aspect"
+  ],
+  "author": "cp",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/artela-network/session-key-aspect/issues"
+  },
+  "homepage": "https://github.com/artela-network/session-key-aspect#readme",
+  "dependencies": {
+    "@artela/web3": "^1.9.18"
+  }
+}
