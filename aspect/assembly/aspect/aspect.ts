@@ -90,14 +90,13 @@ export class Aspect implements IAspectTransaction, IAspectOperation, ITransactio
             "illegal session key scope, method isn't allowed. actual is " + method + ". detail: " + sys.utils.uint8ArrayToHex(ctx.tx.content.unwrap().input));
 
         // 4. verify expire block height
-        // const response = sys.hostApi.runtimeContext.get("tx^context");
-        // sys.require(response.result!.success, "get tx context fail");
-
-        // let tx = Protobuf.decode<EthTransaction>(response.data!.value, EthTransaction.decode)
+        const response = sys.hostApi.runtimeContext.get("block^header^0");
         
+        var ethBlockHeader = Protobuf.decode<EthBlockHeader>(response.data!.value, EthBlockHeader.decode);
+
         // const currentBlockHeight = ctx.tx.content.unwrap().blockNumber;
         const expireBlockHeight = sKeyObj.getExpireBlockHeight();
-        const currentBlockHeight = expireBlockHeight - 1 ;
+        const currentBlockHeight = ethBlockHeader.number + 1;
         sys.require(currentBlockHeight <= expireBlockHeight,
             "session key has expired; " + expireBlockHeight.toString() + " < " + currentBlockHeight.toString());
 

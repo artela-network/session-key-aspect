@@ -185,15 +185,16 @@ async function f() {
         "// ******************************************\n\n");
 
     let currentBlockHeight = await web3.eth.getBlockNumber();
-    let expireBlockHeight = currentBlockHeight + 20; // ~10s
-
+    console.log("currentBlockHeight :", currentBlockHeight);
+    let expireBlockHeight = currentBlockHeight + 10; // ~10s
     // let op = "0x0001" + sKey + sKeyContract + "0001" + contractCallMethod + expireBlockHeight;
     let op =
         "0x0001"
         + sKey
         + sKeyContract
         + "0001" + contractCallMethod
-        + web3.eth.abi.encodeParameter('uint256', expireBlockHeight).slice(48, 64);
+        + rmPrefix(web3.eth.abi.encodeParameter('uint256', expireBlockHeight)).slice(48, 64);
+
     let sessionKeyRegData = aspect.operation(op).encodeABI();
     console.log("op: ", op);
     console.log("calldata: ", sessionKeyRegData);
