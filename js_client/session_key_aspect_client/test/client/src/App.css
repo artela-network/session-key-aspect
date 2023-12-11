@@ -1,9 +1,47 @@
-.center-container {
+.container {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-wrap: wrap;
   justify-content: center;
-  height: 100vh;
+  align-items: flex-start;
+  gap: 20px; /* 两个元素之间的间隔 */
+  width: 1000px;
+  margin: auto; /* 在页面中居中 */
+}
+
+.center-container-aspect {
+  display: flex; /* 使用 Flexbox 布局 */
+  justify-content: center; /* 水平居中 */
+  align-items: center; /* 垂直居中 */
+  flex-direction: column; /* 子元素垂直排列 */
+
+  /* 边框和圆角样式 */
+  border: 2px solid #000000; /* 黑色边框 */
+  border-radius: 10px; /* 圆角 */
+
+  /* 宽度和高度根据内容自适应 */
+  width: 1000px;
+  height: auto;
+
+  /* 其他样式 */
+  margin: auto; /* 在页面中居中 */
+  margin-top: 20px;
+}
+
+.center-container {
+  display: flex; /* 使用 Flexbox 布局 */
+  justify-content: center; /* 水平居中 */
+  align-items: center; /* 垂直居中 */
+  flex-direction: column; /* 子元素垂直排列 */
+
+  /* 边框和圆角样式 */
+  border: 2px solid #000000; /* 黑色边框 */
+  border-radius: 10px; /* 圆角 */
+
+  /* 保留大部分样式不变，只调整 width 和 margin */
+  width: 480px;
+
+  /* 其他样式 */
+  margin-top: 20px;
 }
 
 .input-container {
@@ -34,4 +72,10 @@
 .title  {
   font-weight: bold;
   font-size: 20px;
+}
+
+.title-h1  {
+  font-weight: bold;
+  color: #4CAF50;
+  font-size: 26px;
 }
