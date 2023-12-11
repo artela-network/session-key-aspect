@@ -4,7 +4,8 @@
   "description": "session key aspect client that provides session key management functionality",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --mode production"
   },
   "repository": {
     "type": "git",
@@ -23,6 +24,12 @@
   },
   "homepage": "https://github.com/artela-network/session-key-aspect#readme",
   "dependencies": {
-    "@artela/web3": "^1.9.18"
+    "@artela/web3": "^1.9.18",
+    "buffer": "^6.0.3",
+    "web3": "^4.3.0"
+  },
+  "devDependencies": {
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
   }
 }

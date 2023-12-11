@@ -1,3 +1,5 @@
+const { Buffer } = require('buffer');
+
 class SessionKeyAspectClient {
 
     constructor(web3client, aspectAddress) {
@@ -8,7 +10,7 @@ class SessionKeyAspectClient {
         this.aspect.options.address = aspectAddress;
     }
 
-    async registerSessionKeyByAccount(account, sessionKeyAddress, bindingContractAddress, bindingMethodSigSet, expireBlockNumber = 1000) {
+    async registerSessionKey(account, sessionKeyAddress, bindingContractAddress, bindingMethodSigSet, expireBlockNumber = 1000) {
 
         let tx = await this.registerSessionKeyUnsignTx(account.address, sessionKeyAddress, bindingContractAddress, bindingMethodSigSet, expireBlockNumber);
 
@@ -25,7 +27,16 @@ class SessionKeyAspectClient {
 
         let tx = await this.registerSessionKeyUnsignTx(walletAddress, sessionKeyAddress, bindingContractAddress, bindingMethodSigSet, expireBlockNumber);
 
-        let txHash = await this.web3.eth.sendSignedTransaction(tx);
+        let metamaskTx = {
+            from: tx.from,
+            to: tx.to,
+            value: "0x00",
+            gas: "0x" + tx.gas.toString(16),
+            data: tx.data
+        }
+
+        console.log("metamaskTx:", metamaskTx);
+        let txHash = await this.web3.eth.sendTransaction(metamaskTx);
 
         return txHash;
     }
@@ -46,14 +57,7 @@ class SessionKeyAspectClient {
             + methodSetSize + this.processAndConcatStrings(bindingMethodSigSet)
             + this.rmPrefix(this.web3.eth.abi.encodeParameter('uint256', expireBlockHeight)).slice(48, 64);
 
-        console.log("op: ", op);
-        console.log("params: ", params);
-
         let calldata = this.aspect.operation(op + params).encodeABI();
-
-        // let nonce = await this.web3.eth.getTransactionCount(walletAddress);
-        // let gasPrice = await this.web3.eth.getGasPrice();
-        // let chainId = await this.web3.eth.getChainId();
 
         let tx = {
             from: walletAddress,
@@ -76,16 +80,10 @@ class SessionKeyAspectClient {
         let params = this.rmPrefix(queryKey);
         let calldata = this.aspect.operation(op + params).encodeABI();
 
-        console.log("op: ", op);
-        console.log("params: ", params);
-
         let ret = await this.web3.eth.call({
             to: this.aspectCore.options.address, // contract address
             data: calldata
         });
-
-        console.log("ret ", ret);
-        console.log("ret ", this.web3.eth.abi.decodeParameter('string', ret));
 
         let encodeKey = this.web3.eth.abi.decodeParameter('string', ret);
 
@@ -111,6 +109,16 @@ class SessionKeyAspectClient {
         // *      8 bytes: expire block height
         // *      20 bytes: main key
         // *           eg. 388C818CA8B9251b393131C08a736A67ccB19297 
+
+        if (encodeKey.length == 0) {
+            return {
+                walletAddress: "",
+                sessionKeyAddress: "",
+                bindingContractAddress: "",
+                bindingMethodSet: [],
+                expireBlockHeight: 0
+            }
+        }
 
         if (encodeKey.length < 84) {
             throw new Error('illegal encode session key, length is :' + encodeKey.length);

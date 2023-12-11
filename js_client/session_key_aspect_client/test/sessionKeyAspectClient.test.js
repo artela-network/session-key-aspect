@@ -13,7 +13,6 @@ let sk = fs.readFileSync("./test/privateKey.txt", 'utf-8');
 const account = web3.eth.accounts.privateKeyToAccount(sk.trim());
 web3.eth.accounts.wallet.add(account.privateKey);
 
-
 const testAspectAddress = "0x06786bB59719d7DDD9D42457a16BbCD6953A7cab";
 const testSessionKeyAddress = "0x0250032b4a11478969dc4caaa11ecc2ea98cfc12";
 const testContract = "0330032b4a11478969dc4caaa11ecc2ea98cfcFF";
@@ -24,7 +23,7 @@ async function f() {
     // usage 1
     console.log("// usage 1")
     const aspectClient = new SessionKeyAspectClient(web3, testAspectAddress);
-    let ret = await aspectClient.registerSessionKeyByAccount(account, testSessionKeyAddress, testContract, testMethods, 20);
+    let ret = await aspectClient.registerSessionKey(account, testSessionKeyAddress, testContract, testMethods, 20);
     console.log(ret);
 
     let sessionKey = await aspectClient.getSessionKey(account.address, testSessionKeyAddress, testContract);
