@@ -128,7 +128,7 @@ class SessionKeyAspectClient {
         let bindingContractAddress = "0x" + encodeKey.slice(40, 80);
         let methodSize = parseInt(encodeKey.slice(80, 84), 16);
 
-        if (encodeKey.length < (8 * methodSize + 16 + 40)) {
+        if (encodeKey.length < (84 + 8 * methodSize + 16 + 40)) {
             throw new Error('illegal encode session key, length is :' + encodeKey.length);
         }
 
