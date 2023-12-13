@@ -45,6 +45,8 @@ async function f() {
     await testVerifySessionKeyScope();
     await testVerifySignature();
     await testEcRecover();
+    await testRegisterSessionKey2();
+    await testGetAllSessionKey();
 }
 
 async function deployAspect() {
@@ -81,19 +83,60 @@ async function testRegisterSessionKey() {
 
     let currentBlockHeight = await web3.eth.getBlockNumber();
     let expireBlockHeight = currentBlockHeight + 20;
-    
+
     let op = "0x0001";
     let params =
         sKey
         + contract
         + "0002" + method1 + method2
         + web3.eth.abi.encodeParameter('uint256', expireBlockHeight).slice(48, 64);
-        ;
+    ;
 
     console.log("op: ", op);
     console.log("params: ", params);
 
     let calldata = aspect.operation(op + params).encodeABI();
+
+    let ret = await web3.eth.call({
+        from: account.address,
+        to: aspectCore.options.address, // contract address
+        data: calldata
+    });
+
+    let tx = await getOperationTx(calldata)
+
+    let signedTx = await web3.eth.accounts.signTransaction(tx, account.privateKey);
+    let receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+
+    console.log('register session key result: sucess');
+    console.log(receipt)
+}
+
+async function testRegisterSessionKey2() {
+
+    printTestCase("testRegisterSessionKey2: success");
+
+    let currentBlockHeight = await web3.eth.getBlockNumber();
+    let expireBlockHeight = currentBlockHeight + 20;
+
+    let op = "0x0001";
+    let params =
+        sKey.slice(2) + "CA" // register another key
+        + contract
+        + "0002" + method1 + method2
+        + web3.eth.abi.encodeParameter('uint256', expireBlockHeight).slice(48, 64);
+    ;
+
+    console.log("op: ", op);
+    console.log("params: ", params);
+
+    let calldata = aspect.operation(op + params).encodeABI();
+
+    let ret = await web3.eth.call({
+        from: account.address,
+        to: aspectCore.options.address, // contract address
+        data: calldata
+    });
 
     let tx = await getOperationTx(calldata)
 
@@ -322,6 +365,25 @@ async function testEcRecover() {
         to: aspectCore.options.address, // contract address
         data: calldata
     });
+    console.log("ret ", ret);
+    console.log("ret ", web3.eth.abi.decodeParameter('string', ret));
+}
+
+async function testGetAllSessionKey() {
+    printTestCase("testGetAllSessionKey: success");
+
+    let op = "0x1005";
+    let params = mainKey;
+    let calldata = aspect.operation(op + params).encodeABI();
+
+    console.log("op: ", op);
+    console.log("params: ", params);
+
+    let ret = await web3.eth.call({
+        to: aspectCore.options.address, // contract address
+        data: calldata
+    });
+
     console.log("ret ", ret);
     console.log("ret ", web3.eth.abi.decodeParameter('string', ret));
 }

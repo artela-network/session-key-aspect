@@ -136,6 +136,9 @@ async function f() {
     console.log(`binding contract result:`);
     console.log(receipt);
 
+    let ret2 = await aspectCore.methods.contractsOf(aspect.options.address).call({});
+    console.log("binding result:", ret2)
+
     // ******************************************
     // start testing session keys
     // ******************************************
@@ -162,6 +165,10 @@ async function f() {
     console.log(`binding EoA result:`);
     console.log(receipt);
 
+    ret2 = await aspectCore.methods.contractsOf(aspect.options.address).call({});
+
+    console.log("binding result:", ret2)
+
     // ******************************************
     // step 1. register session key
     // ******************************************
@@ -186,7 +193,7 @@ async function f() {
 
     let currentBlockHeight = await web3.eth.getBlockNumber();
     console.log("currentBlockHeight :", currentBlockHeight);
-    let expireBlockHeight = currentBlockHeight + 10; // ~10s
+    let expireBlockHeight = currentBlockHeight + 100; // ~10s
     // let op = "0x0001" + sKey + sKeyContract + "0001" + contractCallMethod + expireBlockHeight;
     let op =
         "0x0001"
