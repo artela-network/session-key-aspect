@@ -13,7 +13,7 @@ let sk = fs.readFileSync("./test/privateKey.txt", 'utf-8');
 const account = web3.eth.accounts.privateKeyToAccount(sk.trim());
 web3.eth.accounts.wallet.add(account.privateKey);
 
-const testAspectAddress = "0x06786bB59719d7DDD9D42457a16BbCD6953A7cab";
+const testAspectAddress = "0xfbED8f6a18EbEE6eecEc4cb6D3151de35120269C";
 const testSessionKeyAddress = "0x0250032b4a11478969dc4caaa11ecc2ea98cfc12";
 const testContract = "0330032b4a11478969dc4caaa11ecc2ea98cfcFF";
 const testMethods = ["0A0A0A0A", "0B0B0B0B"];
@@ -42,7 +42,26 @@ async function f() {
 
     sessionKey = await aspectClient.getSessionKey(account.address, testSessionKeyAddress, testContract);
     console.log(sessionKey)
+    
+    // bind
+    console.log("// binding address")
+    ret = await aspectClient.bindEoA(account);
+    console.log(ret);
 
+    // query binding address list
+    console.log("// query binding address")
+    ret = await aspectClient.bindingContract();
+    console.log(ret);
+
+    // unbind
+    console.log("// unbinding address")
+    ret = await aspectClient.unbindEoA(account);
+    console.log(ret);
+
+    // query binding address list
+    console.log("// query binding address")
+    ret = await aspectClient.bindingContract();
+    console.log(ret);
 }
 
 f().then();
