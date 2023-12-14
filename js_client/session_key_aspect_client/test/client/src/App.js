@@ -118,9 +118,9 @@ const App = () => {
 
   const handleUnBind = async () => {
     try {
-
+      await aspectClient.unbindEoAByMetamask(walletAddress);
     } catch (error) {
-      console.error('registerSessionKeyByMetamask fail', error);
+      console.error('unbindEoAByMetamask fail', error);
     }
   };
 
@@ -140,15 +140,15 @@ const App = () => {
     try {
       await aspectClient.bindContractByMetamask(walletAddress, contractC);
     } catch (error) {
-      console.error('registerSessionKeyByMetamask fail', error);
+      console.error('bindContractByMetamask fail', error);
     }
   };
 
   const handleUnBindC = async () => {
     try {
-
+      await aspectClient.unbindContractByMetamask(walletAddress, contractC);
     } catch (error) {
-      console.error('registerSessionKeyByMetamask fail', error);
+      console.error('unbindContractByMetamask fail', error);
     }
   };
   
