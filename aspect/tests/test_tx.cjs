@@ -209,6 +209,7 @@ async function f() {
     let currentBlockHeight = await web3.eth.getBlockNumber();
     console.log("currentBlockHeight :", currentBlockHeight);
     let expireBlockHeight = currentBlockHeight + 100; // ~10s
+
     // let op = "0x0001" + sKey + sKeyContract + "0001" + contractCallMethod + expireBlockHeight;
     let op =
         "0x0001"
@@ -316,11 +317,11 @@ async function f() {
     //     32 bytes: s
     //     1 bytes: v
 
-    let validationData = "0x" 
-    + mainKey 
-    + padStart(rmPrefix(signedTx.r),64,"0")
-    + padStart(rmPrefix(signedTx.s),64,"0")
-    + rmPrefix(getOriginalV(signedTx.v, chainId));
+    let validationData = "0x"
+        + mainKey
+        + padStart(rmPrefix(signedTx.r), 64, "0")
+        + padStart(rmPrefix(signedTx.s), 64, "0")
+        + rmPrefix(getOriginalV(signedTx.v, chainId));
 
     console.log("validationData : ", validationData);
     console.log("contractCallData : ", contractCallData);
@@ -342,7 +343,6 @@ async function f() {
     }
 
     let rawTx = '0x' + new EthereumTx(tx).serialize().toString('hex');
-
     receipt = await web3.eth.sendSignedTransaction(rawTx);
     console.log(`call contract with session key result: `);
     console.log(receipt);
