@@ -6,14 +6,15 @@ const fs = require("fs");
 // ******************************************
 // init web3 and private key
 // ******************************************
-const testnetRpc = "https://testnet-rpc1.artela.network"
+// const testnetRpc = "https://testnet-rpc1.artela.network"
+const testnetRpc = "http://47.254.2.74:8545"
 const web3 = new Web3(testnetRpc);
 
 let sk = fs.readFileSync("./test/privateKey.txt", 'utf-8');
 const account = web3.eth.accounts.privateKeyToAccount(sk.trim());
 web3.eth.accounts.wallet.add(account.privateKey);
 
-const testAspectAddress = "0xfbED8f6a18EbEE6eecEc4cb6D3151de35120269C";
+const testAspectAddress = "0xA9d50e86c6CD9c88f58751b3eB8653da0C723D10";
 const testSessionKeyAddress = "0x0250032b4a11478969dc4caaa11ecc2ea98cfc12";
 const testContract = "0330032b4a11478969dc4caaa11ecc2ea98cfcFF";
 const testMethods = ["0A0A0A0A", "0B0B0B0B"];
@@ -42,7 +43,11 @@ async function f() {
 
     sessionKey = await aspectClient.getSessionKey(account.address, testSessionKeyAddress, testContract);
     console.log(sessionKey)
-    
+
+    // query all key
+    let sessionKeys = await aspectClient.getAllSessionKey(account.address);
+    console.log("all sessionKeys", sessionKeys);
+
     // bind
     console.log("// binding address")
     ret = await aspectClient.bindEoA(account);
@@ -50,7 +55,7 @@ async function f() {
 
     // query binding address list
     console.log("// query binding address")
-    ret = await aspectClient.bindingContract();
+    ret = await aspectClient.bindingAccount();
     console.log(ret);
 
     // unbind

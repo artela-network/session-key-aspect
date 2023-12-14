@@ -29,6 +29,7 @@ const App = () => {
   const [queryBindingResult, setQueryBindingResult] = useState("-");
   const [contractC, setContractC] = useState("");
   const [queryBindingResultC, setQueryBindingResultC] = useState("-");
+  const [allSessionKeys, setAllSessionKeys] = useState("[]");
 
   const web3 = new Web3(window.ethereum);
   let aspectClient = new SessionKeyAspectClient(web3, aspectAddress);
@@ -150,11 +151,20 @@ const App = () => {
       console.error('registerSessionKeyByMetamask fail', error);
     }
   };
+  
+  const handleGetAllSessionKeys = async () => {
+    try {
+      let ret = await aspectClient.getAllSessionKey(walletAddress);
+      setAllSessionKeys(ret);
+    } catch (error) {
+      console.error('handleGetAllSessionKeys fail', error);
+    }
+  };
 
   return (
     <div>
       <div className="center-container-aspect">
-        <p className="title">Aspect</p>
+        <p className="title">Session Key Aspect</p>
         <div className="input-container">
           <input
             type="text"
@@ -292,6 +302,18 @@ const App = () => {
           <p className="title">Result</p>
           <div className="info-box">
             <pre>{queryBindingResultC}</pre>
+          </div>
+        </div>
+        <div className="center-container">
+          <p className="title-h1">Your session keys</p>
+          <p className="title">Connected Wallet</p>
+          <p>{walletAddress}</p>
+          <div className="button-container">
+            <button className="register-button" onClick={handleGetAllSessionKeys}>query</button>
+          </div>
+          <p className="title">Result</p>
+          <div className="info-box">
+            <pre>{allSessionKeys}</pre>
           </div>
         </div>
       </div>

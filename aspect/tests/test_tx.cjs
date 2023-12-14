@@ -35,6 +35,21 @@ function getOriginalV(hexV, chainId_) {
     return originalVHex;
 }
 
+function padStart(str, targetLength, padString) {
+    targetLength = Math.max(targetLength, str.length);
+    padString = String(padString || ' ');
+
+    if (str.length >= targetLength) {
+        return str;
+    } else {
+        targetLength = targetLength - str.length;
+        if (targetLength > padString.length) {
+            padString += padString.repeat(targetLength / padString.length);
+        }
+        return padString.slice(0, targetLength) + str;
+    }
+}
+
 async function f() {
     console.log('start running demo');
 
@@ -300,7 +315,12 @@ async function f() {
     //     32 bytes: r
     //     32 bytes: s
     //     1 bytes: v
-    let validationData = "0x" + mainKey + rmPrefix(signedTx.r) + rmPrefix(signedTx.s) + rmPrefix(getOriginalV(signedTx.v, chainId));
+
+    let validationData = "0x" 
+    + mainKey 
+    + padStart(rmPrefix(signedTx.r),64,"0")
+    + padStart(rmPrefix(signedTx.s),64,"0")
+    + rmPrefix(getOriginalV(signedTx.v, chainId));
 
     console.log("validationData : ", validationData);
     console.log("contractCallData : ", contractCallData);
@@ -375,8 +395,8 @@ async function f() {
         receipt = await web3.eth.sendSignedTransaction(rawTx);
         throw new Error('this case must be error.');
     } catch (error) {
-        console.error(error);
-        console.log(`call contract with session key result: fail`);
+        // console.error(error);
+        console.log(`pass: call contract with illgal session key`);
     }
 
     console.log(`all test cases pass`);

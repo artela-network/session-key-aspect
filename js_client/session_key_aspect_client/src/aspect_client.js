@@ -90,9 +90,130 @@ class SessionKeyAspectClient {
         return this.decodeSessionKey(encodeKey);
     }
 
+    async getAllSessionKey(walletAddress) {
+
+        walletAddress = this.rmPrefix(walletAddress);
+
+        let op = "0x1005";
+        let params = this.rmPrefix(walletAddress);
+        let calldata = this.aspect.operation(op + params).encodeABI();
+
+        let ret = await this.web3.eth.call({
+            to: this.aspectCore.options.address, // contract address
+            data: calldata
+        });
+
+        let encodeKey = this.web3.eth.abi.decodeParameter('string', ret);
+
+        encodeKey = encodeKey.slice(4);
+
+        let sessionKeys = new Array();
+        while (encodeKey.length != 0) {
+            let popMethodSize = parseInt(encodeKey.slice(80, 84), 16);
+            let currentEncodeKeySize = 84 + 8 * popMethodSize + 16 + 40;
+            let popEncodeKey = encodeKey.slice(0, currentEncodeKeySize);
+            encodeKey = encodeKey.slice(currentEncodeKeySize);
+
+            sessionKeys.push(this.decodeSessionKey(popEncodeKey));
+        }
+
+        return sessionKeys;
+    }
+
     async getSessioinKeyExpireHeight(walletAddress, sessionKeyAddress, bindingContractAddress) {
         let sessionKey = await this.getSessionKey(walletAddress, sessionKeyAddress, bindingContractAddress);
         return sessionKey.expireBlockHeight
+    }
+
+    async bindEoA(account) {
+        let eoaBindingData = await this.aspectCore.methods.bind(this.aspect.options.address, 1, account.address, 1).encodeABI();
+
+        let tx = {
+            from: account.address,
+            to: this.aspectCore.options.address,
+            gas: 4000000,
+            data: eoaBindingData,
+        }
+
+        let signedTx = await this.web3.eth.accounts.signTransaction(tx, account.privateKey);
+        let receipt = await this.web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+
+        return {
+            success: receipt.status,
+            receipt: receipt
+        }
+    }
+
+    async bindEoAByMetamask(walletAddress) {
+        let eoaBindingData = await this.aspectCore.methods.bind(this.aspect.options.address, 1, walletAddress, 1).encodeABI();
+
+        let gas = 4000000;
+        let metamaskTx = {
+            from: walletAddress,
+            to: this.aspectCore.options.address,
+            value: "0x00",
+            gas: "0x" + gas.toString(16),
+            data: eoaBindingData
+        }
+
+        console.log("metamaskTx:", metamaskTx);
+        let txHash = await this.web3.eth.sendTransaction(metamaskTx);
+
+        return txHash;
+    }
+
+    async unbindEoA(account) {
+        let eoaBindingData = await this.aspectCore.methods.unbind(this.aspect.options.address, account.address).encodeABI();
+        console.log(eoaBindingData);
+        let tx = {
+            from: account.address,
+            to: this.aspectCore.options.address,
+            gas: 4000000,
+            data: eoaBindingData,
+        }
+
+        let signedTx = await this.web3.eth.accounts.signTransaction(tx, account.privateKey);
+        let receipt = await this.web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+        console.log(receipt);
+
+        return {
+            success: receipt.status,
+            receipt: receipt
+        }
+    }
+
+    async ifBinding(address) {
+        let ret = await this.aspectCore.methods.contractsOf(this.aspect.options.address).call({});
+
+        console.log("binding account:", ret)
+
+        return ret.map(str => str.toLowerCase()).includes(address.toLowerCase());
+    }
+
+    async bindingAccount() {
+        let ret = await this.aspectCore.methods.contractsOf(this.aspect.options.address).call({});
+
+        console.log("binding account:", ret)
+
+        return ret;
+    }
+
+    async bindContractByMetamask(walletAddress, contractAddress) {
+        let eoaBindingData = await this.aspectCore.methods.bind(this.aspect.options.address, 1, contractAddress, 1).encodeABI();
+
+        let gas = 4000000;
+        let metamaskTx = {
+            from: walletAddress,
+            to: this.aspectCore.options.address,
+            value: "0x00",
+            gas: "0x" + gas.toString(16),
+            data: eoaBindingData
+        }
+
+        console.log("metamaskTx:", metamaskTx);
+        let txHash = await this.web3.eth.sendTransaction(metamaskTx);
+
+        return txHash;
     }
 
     decodeSessionKey(encodeKey) {
@@ -128,7 +249,7 @@ class SessionKeyAspectClient {
         let bindingContractAddress = "0x" + encodeKey.slice(40, 80);
         let methodSize = parseInt(encodeKey.slice(80, 84), 16);
 
-        if (encodeKey.length < (8 * methodSize + 16 + 40)) {
+        if (encodeKey.length < (84 + 8 * methodSize + 16 + 40)) {
             throw new Error('illegal encode session key, length is :' + encodeKey.length);
         }
 
