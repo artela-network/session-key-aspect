@@ -7,7 +7,7 @@ const SessionKeyAspectClient = require('sessioin-key-aspect-client');
 const App = () => {
 
   const testMethods = "0A0A0A0A,0B0B0B0B";
-  const testAspectAddress = "0x06786bB59719d7DDD9D42457a16BbCD6953A7cab";
+  const testAspectAddress = "0x3f2CdeA0c24dF0A37Df11766450C9c6335486EC8";
 
   const [aspectAddress, setAspectAddress] = useState(testAspectAddress);
   const [walletAddress, setWalletAddress] = useState('');
@@ -155,7 +155,7 @@ const App = () => {
   const handleGetAllSessionKeys = async () => {
     try {
       let ret = await aspectClient.getAllSessionKey(walletAddress);
-      setAllSessionKeys(ret);
+      setAllSessionKeys(JSON.stringify(ret, null, 2));
     } catch (error) {
       console.error('handleGetAllSessionKeys fail', error);
     }

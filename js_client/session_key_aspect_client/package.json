@@ -1,6 +1,6 @@
 {
   "name": "sessioin-key-aspect-client",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "session key aspect client that provides session key management functionality",
   "main": "index.js",
   "scripts": {
