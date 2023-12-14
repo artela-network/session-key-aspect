@@ -57,6 +57,16 @@ console.log(sessionKey)
 
 
 
+## Usage
+
+**Usage 1.** Use `registerSessionKey` to sign and send the session key.
+
+**Usage 2.** Use `registerSessionKeyUnsignTx` to construct an unsigned transaction and then sign and send it by your web3 client.
+
+**Usage 3.** Use `registerSessionKeyByMetamask` to require Metamask to sign and send the register transaction.
+
+
+
 ## API Reference
 
 ### 1. `registerSessionKey`
@@ -65,17 +75,17 @@ Registers a new session key.
 
 - **Parameters**:
 
-  - `account`: The web3.js account object. Learn more: [web3.eth.accounts](https://web3js.readthedocs.io/en/v1.10.0/web3-eth-accounts.html#privatekeytoaccount)
-  - `sessionKeyAddress`: The session key address. 
-  - `bindingContractAddress`: The contract address to bind.
-  - `bindingMethodSigSet`: An array of method signatures.
-  - `expireBlockNumber`: The number of blocks until expiration (default 1000).
+  - `account` - object: The web3.js account object. Learn more: [web3.eth.accounts](https://web3js.readthedocs.io/en/v1.10.0/web3-eth-accounts.html#privatekeytoaccount)
+  - `sessionKeyAddress` - string: The session key address. 
+  - `bindingContractAddress` - string: The contract address to bind.
+  - `bindingMethodSigSet` - string[]: An array of method signatures.
+  - `expireBlockNumber` - number: The number of blocks until expiration (default 1000).
 
 - **Returns**: An object containing the success status and transaction receipt.
 
-  - success: true | false
+  - `success` - boolean: true | false
 
-  - receipt: a web3.js receipt object. Learn more: [receipt](https://web3js.readthedocs.io/en/v1.10.0/web3-eth.html?highlight=receipt#gettransactionreceipt)
+  - `receipt` - object: a web3.js receipt object. Learn more: [receipt](https://web3js.readthedocs.io/en/v1.10.0/web3-eth.html?highlight=receipt#gettransactionreceipt)
 
 - **Example**:
 
@@ -99,11 +109,11 @@ Registers a session key through MetaMask. Call this method will ask for Metamask
 
 - **Parameters**: 
 
-  - `accountAddress`: The address of the account.
-  - `sessionKeyAddress`: The session key address. 
-  - `bindingContractAddress`: The contract address to bind.
-  - `bindingMethodSigSet`: An array of method signatures.
-  - `expireBlockNumber`: The number of blocks until expiration (default 1000).
+  - `accountAddress` - string: The address of the account.
+  - `sessionKeyAddress` - string: The session key address. 
+  - `bindingContractAddress` - string: The contract address to bind.
+  - `bindingMethodSigSet` - string[]: An array of method signatures.
+  - `expireBlockNumber` - number: The number of blocks until expiration (default 1000).
 
 - **Returns**: Transaction hash.
 - **Example**:
@@ -138,10 +148,10 @@ Generates an unsigned transaction for registering a session key. Then, the calle
 - **Parameters**: Similar to `registerSessionKeyByMetamask`.
 - **Returns**: Unsigned transaction object.
 
-  - from: main key address
-  - to: Aspect system contract address
-  - gas: gas of this tx
-  - data: call data of register session key
+  - `from`  - string: main key address
+  - `to`  - string: Aspect system contract address
+  - `gas` - number: gas of this tx
+  - `data`  - string: call data of register session key
 
 - **Example**:
 
@@ -168,16 +178,16 @@ Generates an unsigned transaction for registering a session key. Then, the calle
 Retrieves the session key.
 
 - **Parameters**:
-  - `walletAddress`: The wallet address. E.g. `0xCAFE...CAFE`
-  - `sessionKeyAddress`: The session key address. E.g. `0xCAFE...CAFE`
-  - `bindingContractAddress`: The contract address. E.g. `0xCAFE...CAFE`
-- **Returns**: Decoded session key information.
+  - `walletAddress` - string: The wallet address. E.g. `0xCAFE...CAFE`
+  - `sessionKeyAddress` - string: The session key address. E.g. `0xCAFE...CAFE`
+  - `bindingContractAddress` - string: The contract address. E.g. `0xCAFE...CAFE`
+- **Returns**:  Session key object.
 
-  - walletAddress: the main key
-  - sessionKeyAddress: the session key
-  - bindingContractAddress: the binding contract of this session key
-  - bindingMethodSet:  the binding contract method set of this session key
-  - expireBlockHeight: the expire block height of this session key
+  - `walletAddress` - string: the main key
+  - `sessionKeyAddress` - string: the session key
+  - `bindingContractAddress` - string: the binding contract of this session key
+  - `bindingMethodSet` - string[]:  the binding contract method set of this session key
+  - `expireBlockHeight` - number: the expire block height of this session key
 
 - **Example:**
 
@@ -199,4 +209,154 @@ Retrieves the session key.
 Retrieves the expiration height of the session key.
 
 - **Parameters**: Similar to `getSessionKey`.
-- **Returns**: The block height at which the session key expires.
+
+- **Returns**: Number; The block height at which the session key expires.
+
+  
+
+### 6. `getAllSessionKey`
+
+Retrieves all session keys of specific EoA
+
+- **Parameters**: 
+  - `walletAddress` - string: The EoA address. E.g. `0xCAFE...CAFE`
+- **Returns**: Session key object array. The object struct is similar to `getSessionKey`.
+
+
+
+### 7. `bindEoA`
+
+Bind EoA to the aspect.
+
+- **Parameters**: 
+
+  - `account` - object: The web3.js account object of EoA. Learn more: [web3.eth.accounts](https://web3js.readthedocs.io/en/v1.10.0/web3-eth-accounts.html#privatekeytoaccount)
+
+- **Returns**: An object containing the success status and transaction receipt.
+
+  - `success` - boolean: true | false
+
+  - `receipt` - object: a web3.js receipt object. Learn more: [receipt](https://web3js.readthedocs.io/en/v1.10.0/web3-eth.html?highlight=receipt#gettransactionreceipt)
+
+- **Example**:
+
+  ```js
+  // init your main key
+  const yourWalletPrivateKey = "0xCAFE....CAFE";
+  const account = web3.eth.accounts.privateKeyToAccount(yourWalletPrivateKey);
+  
+  let ret = await aspectClient.bindEoA(account);
+  ```
+
+### 
+
+### 8. `unbindEoAByMetamask`
+
+Bind EoA to the Aspect through MetaMask. Call this method will ask for Metamask signatrure.
+
+- **Parameters**: 
+  - `accountAddress` - string: The address of the EoA.
+- **Returns**: Transaction hash.
+
+
+
+### 9. `unbindEoA`
+
+Undind EoA from the Aspect.
+
+- **Parameters**: 
+
+  - `account` - object: The web3.js account object of EoA. Learn more: [web3.eth.accounts](https://web3js.readthedocs.io/en/v1.10.0/web3-eth-accounts.html#privatekeytoaccount)
+
+- **Returns**: An object containing the success status and transaction receipt.
+
+  - `success` - boolean: true | false
+
+  - `receipt` - object: a web3.js receipt object. Learn more: [receipt](https://web3js.readthedocs.io/en/v1.10.0/web3-eth.html?highlight=receipt#gettransactionreceipt)
+
+- **Example**:
+
+  ```js
+  // init your main key
+  const yourWalletPrivateKey = "0xCAFE....CAFE";
+  const account = web3.eth.accounts.privateKeyToAccount(yourWalletPrivateKey);
+  
+  let ret = await aspectClient.unbindEoA(account);
+  ```
+
+### 
+
+### 10. `unbindEoAByMetamask`
+
+Unbind EoA from the Aspect through MetaMask. Call this method will ask for Metamask signatrure.
+
+- **Parameters**: 
+  - `accountAddress`  - string: The address of the EoA.
+- **Returns**: String; Transaction hash.
+
+
+
+### 11. `bindContract`
+
+Bind a smart contract to the Aspect.
+
+- **Parameters**: 
+
+  - `account` - object: The owner of the smart contract. It's a web3.js account object of EoA. Learn more: [web3.eth.accounts](https://web3js.readthedocs.io/en/v1.10.0/web3-eth-accounts.html#privatekeytoaccount)
+  - `contractAddress` - string: The smart contract address.
+
+- **Returns**: An object containing the success status and transaction receipt.
+
+  - `success` - boolean: true | false
+
+  - `receipt` - object: a web3.js receipt object. Learn more: [receipt](https://web3js.readthedocs.io/en/v1.10.0/web3-eth.html?highlight=receipt#gettransactionreceipt)
+
+- **Example**:
+
+  ```js
+  // init your main key
+  const yourWalletPrivateKey = "0xCAFE....CAFE";
+  const account = web3.eth.accounts.privateKeyToAccount(yourWalletPrivateKey);
+  
+  let ret = await aspectClient.bindContract(account);
+  ```
+
+### 
+
+### 12. `bindContractByMetamask`
+
+Bind a smart contract to the Aspect through MetaMask. Call this method will ask for Metamask signatrure.
+
+- **Parameters**: 
+  - `accountAddress` - string: The owner of the smart contract. 
+  - `contractAddress` - string: The smart contract address.
+- **Returns**: Transaction hash.
+
+- **Example**:
+
+  ```js
+  // init your main key
+  const eoaAddress = "0xCAFE....CAFE";
+  const smartContractAddress = "0xCAFE....CAFE";
+  
+  let ret = await aspectClient.bindContract(eoaAddress, smartContractAddress);
+  ```
+
+
+
+### 13. `ifBinding`
+
+Query if is a EoA or smart contract bound to the Aspect.
+
+- **Parameters**:
+  - `address` - string: The address of EoA or smart contract. E.g. `0xCAFE...CAFE`
+- **Returns**:  Bool
+
+
+
+### 14. `getBindingAccount`
+
+Query all address binding to this Aspect.
+
+- **Returns**:  String array of address
+
