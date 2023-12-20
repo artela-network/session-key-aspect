@@ -19,7 +19,6 @@ import {
 
 import { Protobuf } from "as-proto/assembly/Protobuf";
 
-
 /**
  * Brief intro:
  * 
@@ -91,7 +90,7 @@ export class Aspect implements IAspectTransaction, IAspectOperation, ITransactio
 
         // 4. verify expire block height
         const response = sys.hostApi.runtimeContext.get("block^header^0");
-        
+
         var ethBlockHeader = Protobuf.decode<EthBlockHeader>(response.data!.value, EthBlockHeader.decode);
 
         // const currentBlockHeight = ctx.tx.content.unwrap().blockNumber;
@@ -119,9 +118,10 @@ export class Aspect implements IAspectTransaction, IAspectOperation, ITransactio
         //
         //           ** 0x10xx means read only op **
         //           0x1001 | getSessionKey
-        //           0x0002 | verifySessionKeyScope
-        //           0x0003 | verifySignature
-        //           0x0004 | ecRecover
+        //           0x1002 | verifySessionKeyScope
+        //           0x1003 | verifySignature
+        //           0x1004 | ecRecover
+        //           0x1005 | getAllSessionKey
         //
         // * variable-length bytes: params
         //      encode rule of params is defined by each method
@@ -148,6 +148,10 @@ export class Aspect implements IAspectTransaction, IAspectOperation, ITransactio
         }
         else if (op == "1004") {
             const ret = this.ecRecover(params, ctx);
+            return sys.utils.stringToUint8Array(ret);
+        }
+        else if (op == "1005") {
+            const ret = this.getAllSessionKey(params, ctx);
             return sys.utils.stringToUint8Array(ret);
         }
         else {
@@ -204,11 +208,49 @@ export class Aspect implements IAspectTransaction, IAspectOperation, ITransactio
         const sKeyObj = new SessionKey(encodeKey);
         sKeyObj.verify();
 
-        sys.aspect.mutableState(ctx).get<string>(sKeyObj.getStateKey()).set(sKeyObj.getEncodeKey());
+        // save key
+        const stateKey = sKeyObj.getStateKey();
+        sys.aspect.mutableState(ctx).get<string>(stateKey).set(sKeyObj.getEncodeKey());
+
+        // save key index
+        let encodeIndex = sys.aspect.mutableState(ctx).get<string>(sKeyObj.getEoA()).unwrap();
+        const index = new SessionKeyIndexArray(encodeIndex);
+
+        if (!index.decode().includes(stateKey)) {
+            index.append(stateKey);
+            sys.aspect.mutableState(ctx).get<string>(sKeyObj.getEoA()).set(index.getEncodeKey())
+        }
     }
 
     getSessionKey(params: string, ctx: OperationCtx): string {
-        return sys.aspect.mutableState(ctx).get<string>(params).unwrap();
+        // params encode rules:
+        //     32 bytes: stroge key of session key
+        sys.require(params.length == 64, "illegal params");
+        return sys.aspect.mutableState(ctx).get<string>(params.toLowerCase()).unwrap();
+    }
+
+    getAllSessionKey(params: string, ctx: OperationCtx): string {
+
+        // params encode rules:
+        //     20 bytes: EoA address
+        //         eg. e2f8857467b61f2e4b1a614a0d560cd75c0c076f
+        sys.require(params.length == 40, "illegal params");
+
+        let encodeIndexObj = sys.aspect.mutableState(ctx).get<string>(params.toLowerCase());
+
+        const index = new SessionKeyIndexArray(encodeIndexObj.unwrap());
+
+        if (index.getEncodeKey() == "") {
+            return "";
+        }
+
+        let allSessionKey = index.getEncodeKey().slice(0, 4);
+        let indexArray = index.decode();
+        for (let i = 0; i < index.getSize().toInt32(); ++i) {
+            allSessionKey += this.getSessionKey(indexArray[i], ctx);
+        }
+
+        return allSessionKey;
     }
 
     verifySessionKeyScope(params: string, ctx: OperationCtx): bool {
@@ -407,16 +449,80 @@ class SessionKey {
     }
 
     getEoA(): string {
-        return this.encodeKey.slice(84 + 8 * this.getMethodCount().toInt32() + 16, this.encodeKey.length);
+        return this.encodeKey.slice(84 + 8 * this.getMethodCount().toInt32() + 16, this.encodeKey.length).toLowerCase();
     }
 
     getStateKey(): string {
         return sys.utils.uint8ArrayToHex(
-            sys.hostApi.crypto.keccak(sys.utils.hexToUint8Array(this.getContractAddress() + this.getEoA() + this.getSKey())));
+            sys.hostApi.crypto.keccak(sys.utils.hexToUint8Array(this.getContractAddress() + this.getEoA() + this.getSKey()))).toLowerCase();
     }
 
     static getStateKey(contract: string, eoa: string, sKey: string): string {
         return sys.utils.uint8ArrayToHex(
-            sys.hostApi.crypto.keccak(sys.utils.hexToUint8Array(contract + eoa + sKey)));
+            sys.hostApi.crypto.keccak(sys.utils.hexToUint8Array(contract + eoa + sKey))).toLowerCase();
+    }
+}
+
+class SessionKeyIndexArray {
+    private encodeKey: string;
+
+    constructor(encode: string) {
+        this.encodeKey = encode;
+    }
+
+    getEncodeKey(): string {
+        return this.encodeKey;
+    }
+
+    getSize(): BigInt {
+        return BigInt.fromString(this.encodeKey.slice(0, 4), 16);
+    }
+
+    append(key: string): void {
+        if ("" == this.encodeKey) {
+            this.encodeKey = "0001" + key;
+            return;
+        }
+
+        this.encodeKey += key;
+        let newSize = this.getSize().toInt32() + 1;
+        this.encodeKey = this.encodeSize(newSize) + this.encodeKey.slice(4);
+    }
+
+    decode(): Array<string> {
+
+        if ("" == this.encodeKey) {
+            return [];
+        }
+
+        const encodeArray = this.encodeKey.slice(4);
+        const array = new Array<string>();
+        for (let i = 0; i < this.getSize().toInt32(); ++i) {
+            array[i] = encodeArray.slice(64 * i, 64 * (i + 1));
+        }
+        return array;
+    }
+
+    encode(array: Array<string>): string {
+        let encodeString = this.encodeSize(array.length);
+        for (let i = 0; i < array.length; ++i) {
+            encodeString += this.rmPrefix(array[i])
+        }
+        return encodeString;
+    }
+
+    encodeSize(size: i32): string {
+        let sizeHex = size.toString(16);
+        sizeHex = this.rmPrefix(sizeHex);
+        sizeHex = sizeHex.padStart(4, "0");
+        return sizeHex;
+    }
+
+    rmPrefix(data: string): string {
+        if (data.startsWith('0x')) {
+            return data.substring(2, data.length);
+        } else {
+            return data;
+        }
     }
 }

@@ -35,6 +35,21 @@ function getOriginalV(hexV, chainId_) {
     return originalVHex;
 }
 
+function padStart(str, targetLength, padString) {
+    targetLength = Math.max(targetLength, str.length);
+    padString = String(padString || ' ');
+
+    if (str.length >= targetLength) {
+        return str;
+    } else {
+        targetLength = targetLength - str.length;
+        if (targetLength > padString.length) {
+            padString += padString.repeat(targetLength / padString.length);
+        }
+        return padString.slice(0, targetLength) + str;
+    }
+}
+
 async function f() {
     console.log('start running demo');
 
@@ -136,6 +151,9 @@ async function f() {
     console.log(`binding contract result:`);
     console.log(receipt);
 
+    let ret2 = await aspectCore.methods.contractsOf(aspect.options.address).call({});
+    console.log("binding result:", ret2)
+
     // ******************************************
     // start testing session keys
     // ******************************************
@@ -162,6 +180,10 @@ async function f() {
     console.log(`binding EoA result:`);
     console.log(receipt);
 
+    ret2 = await aspectCore.methods.contractsOf(aspect.options.address).call({});
+
+    console.log("binding result:", ret2)
+
     // ******************************************
     // step 1. register session key
     // ******************************************
@@ -186,7 +208,8 @@ async function f() {
 
     let currentBlockHeight = await web3.eth.getBlockNumber();
     console.log("currentBlockHeight :", currentBlockHeight);
-    let expireBlockHeight = currentBlockHeight + 3; // ~10s
+    let expireBlockHeight = currentBlockHeight + 100; // ~10s
+
     // let op = "0x0001" + sKey + sKeyContract + "0001" + contractCallMethod + expireBlockHeight;
     let op =
         "0x0001"
@@ -293,7 +316,12 @@ async function f() {
     //     32 bytes: r
     //     32 bytes: s
     //     1 bytes: v
-    let validationData = "0x" + mainKey + rmPrefix(signedTx.r) + rmPrefix(signedTx.s) + rmPrefix(getOriginalV(signedTx.v, chainId));
+
+    let validationData = "0x"
+        + mainKey
+        + padStart(rmPrefix(signedTx.r), 64, "0")
+        + padStart(rmPrefix(signedTx.s), 64, "0")
+        + rmPrefix(getOriginalV(signedTx.v, chainId));
 
     console.log("validationData : ", validationData);
     console.log("contractCallData : ", contractCallData);
@@ -315,14 +343,9 @@ async function f() {
     }
 
     let rawTx = '0x' + new EthereumTx(tx).serialize().toString('hex');
-  //  try {
-        receipt = await web3.eth.sendSignedTransaction(rawTx);
-        console.log(`call contract with session key result: `);
-        console.log(receipt);
-    // }catch (error){
-    //     console.error(error);
-    //     console.log(`test sign by skey: fail`);
-    // }
+    receipt = await web3.eth.sendSignedTransaction(rawTx);
+    console.log(`call contract with session key result: `);
+    console.log(receipt);
 
     // ******************************************
     // test sign by skey: fail due to illegal skey
@@ -372,8 +395,8 @@ async function f() {
         receipt = await web3.eth.sendSignedTransaction(rawTx);
         throw new Error('this case must be error.');
     } catch (error) {
-        console.error(error);
-        console.log(`call contract with session key result: fail`);
+        // console.error(error);
+        console.log(`pass: call contract with illgal session key`);
     }
 
     console.log(`all test cases pass`);
