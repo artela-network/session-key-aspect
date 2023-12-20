@@ -324,7 +324,7 @@ export class Aspect implements IAspectTransaction, IAspectOperation, ITransactio
     // ***********************************
     // base Aspect api
     // ***********************************
-    isOwner(sender: string): bool { return false; }
+    isOwner(sender: string): bool { return true; }
     onContractBinding(contractAddr: string): bool { return true; }
 
     // ***********************************

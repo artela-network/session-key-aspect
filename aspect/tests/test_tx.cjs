@@ -315,14 +315,14 @@ async function f() {
     }
 
     let rawTx = '0x' + new EthereumTx(tx).serialize().toString('hex');
-    try {
+  //  try {
         receipt = await web3.eth.sendSignedTransaction(rawTx);
         console.log(`call contract with session key result: `);
         console.log(receipt);
-    }catch (error){
-        console.error(error);
-        console.log(`test sign by skey: fail`);
-    }
+    // }catch (error){
+    //     console.error(error);
+    //     console.log(`test sign by skey: fail`);
+    // }
 
     // ******************************************
     // test sign by skey: fail due to illegal skey
