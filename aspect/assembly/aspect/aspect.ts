@@ -1,9 +1,8 @@
-
 import {
     BigInt,
+    EthBlockHeader,
     FilterTxCtx,
     IAspectOperation,
-    IAspectTransaction,
     ITransactionVerifier,
     OperationCtx,
     PostContractCallCtx,
@@ -11,13 +10,12 @@ import {
     PostTxExecuteCtx,
     PreContractCallCtx,
     PreTxExecuteCtx,
-    VerifyTxCtx,
     sys,
-    EthBlockHeader,
-    EthTransaction
+    VerifyTxCtx,
 } from "@artela/aspect-libs";
 
-import { Protobuf } from "as-proto/assembly/Protobuf";
+import {Protobuf} from "as-proto/assembly/Protobuf";
+import {UtilApi} from "@artela/aspect-libs/hostapi/util-api";
 
 /**
  * Brief intro:
@@ -31,7 +29,7 @@ import { Protobuf } from "as-proto/assembly/Protobuf";
  * * Function 'verifyTx': implements the session key verification logic.
  * * Function 'operation': implement the session key management logic. EoA call this function to register, update and delete its session keys.
  */
-export class Aspect implements IAspectTransaction, IAspectOperation, ITransactionVerifier {
+export class Aspect implements  IAspectOperation, ITransactionVerifier {
 
     // ***************************************
     // interface methods
@@ -67,7 +65,7 @@ export class Aspect implements IAspectTransaction, IAspectOperation, ITransactio
             + r
             + s;
 
-        const ret = sys.hostApi.crypto.ecRecover(sys.utils.hexToUint8Array(syscallInput));
+        const ret = sys.hostApi.crypto._ecRecover(sys.utils.hexToUint8Array(syscallInput));
         const skey = sys.utils.uint8ArrayToHex(ret.subarray(12, 32));
 
         sys.require(skey != "", "illegal signature, verify fail");
@@ -333,7 +331,7 @@ export class Aspect implements IAspectTransaction, IAspectOperation, ITransactio
             + r
             + s;
 
-        const ret = sys.hostApi.crypto.ecRecover(sys.utils.hexToUint8Array(syscallInput));
+        const ret = sys.hostApi.crypto._ecRecover(sys.utils.hexToUint8Array(syscallInput));
         const signer = sys.utils.uint8ArrayToHex(ret.subarray(12, 32));
 
         if (signer == "") {
@@ -357,7 +355,7 @@ export class Aspect implements IAspectTransaction, IAspectOperation, ITransactio
             + r
             + s;
 
-        const ret = sys.hostApi.crypto.ecRecover(sys.utils.hexToUint8Array(syscallInput));
+        const ret = sys.hostApi.crypto._ecRecover(sys.utils.hexToUint8Array(syscallInput));
         const retHex = sys.utils.uint8ArrayToHex(ret);
 
         return retHex;

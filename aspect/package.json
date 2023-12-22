@@ -20,17 +20,17 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@artela/aspect-libs": "^0.0.26",
-    "@artela/web3": "^1.9.18",
-    "@artela/web3-atl": "^1.9.18",
-    "@artela/web3-eth": "^1.9.18",
-    "@artela/web3-utils": "^1.9.8",
+    "@artela/aspect-libs": "file://Users/admin/mytech/go-work/src/github.com/artela-network/aspect-tooling/packages/libs",
+    "@artela/web3": "^1.9.21",
+    "@artela/web3-atl": "^1.9.21",
+    "@artela/web3-eth": "^1.9.19",
+    "@artela/web3-utils": "^1.9.19",
     "@assemblyscript/loader": "^0.27.5",
     "as-proto": "^1.3.0",
     "ethereumjs-tx": "^2.1.2"
   },
   "devDependencies": {
-    "@artela/aspect-tool": "^0.0.47",
+    "@artela/aspect-tool": "^0.0.50",
     "as-proto-gen": "^1.3.0",
     "assemblyscript": "^0.27.5",
     "yargs": "^17.7.2"
