@@ -337,7 +337,7 @@ async function f() {
        // from: sKeyAccount.address,
         nonce: numberToHex(nonce - 1),
         gasPrice: numberToHex(gasPrice),
-        gas: numberToHex(800000000),
+        gas: numberToHex(8000000),
         data: encodedData,
         to: contract.options.address,
         chainId: numberToHex(chainId)
@@ -348,7 +348,6 @@ async function f() {
 
 
     // wait for block committing
-    await new Promise(r => setTimeout(r, 1000));
     let rawTx = '0x' + new EthereumTx(tx).serialize().toString('hex');
     receipt = await web3.eth.sendSignedTransaction(rawTx);
     console.log(`call contract with session key result: `);
@@ -366,7 +365,7 @@ async function f() {
         from: sKeyAccount.address,
         nonce: nonce++,
         gasPrice,
-        gas: 80000000,
+        gas: 8000000,
         data: contractCallData,
         to: contract.options.address,
         chainId
@@ -390,7 +389,7 @@ async function f() {
         from: sKeyAccount.address,
         nonce: numberToHex(nonce - 1),
         gasPrice: numberToHex(gasPrice),
-        gas: numberToHex(80000000),
+        gas: numberToHex(8000000),
         data: encodedData,
         to: contract.options.address,
         chainId: numberToHex(chainId)
