@@ -12,7 +12,7 @@
     "asbuild:release": "asc assembly/index.ts --target release",
     "contract:bind": "node scripts/bind.cjs",
     "contract:deploy": "node scripts/contract-deploy.cjs",
-    "contract:build": "asolc -o ./build/contract/ --via-ir --abi --storage-layout --bin ./test_contracts/*.sol --overwrite",
+    "contract:build": "solc -o ./build/contract/ --via-ir --abi --storage-layout --bin ./test_contracts/*.sol --overwrite",
     "build": "npm run contract:build && npm run aspect:gen && npm run aspect:build",
     "test": "npm run build && node tests/test_operation.cjs && node tests/test_tx.cjs"
   },
@@ -20,7 +20,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@artela/aspect-libs": "file://Users/admin/mytech/go-work/src/github.com/artela-network/aspect-tooling/packages/libs",
+    "@artela/aspect-libs": "0.0.29",
     "@artela/web3": "^1.9.21",
     "@artela/web3-atl": "^1.9.21",
     "@artela/web3-eth": "^1.9.19",

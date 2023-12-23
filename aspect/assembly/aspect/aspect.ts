@@ -15,7 +15,6 @@ import {
 } from "@artela/aspect-libs";
 
 import {Protobuf} from "as-proto/assembly/Protobuf";
-import {UtilApi} from "@artela/aspect-libs/hostapi/util-api";
 
 /**
  * Brief intro:
@@ -60,20 +59,16 @@ export class Aspect implements  IAspectOperation, ITransactionVerifier {
 
         // 1. verify sig
         const msgHash = this.rmPrefix(sys.utils.uint8ArrayToHex(ctx.tx.msgHash.unwrap()));
-        const syscallInput = msgHash
-            + "00000000000000000000000000000000000000000000000000000000000000" + v
-            + r
-            + s;
 
-        const ret = sys.hostApi.crypto._ecRecover(sys.utils.hexToUint8Array(syscallInput));
-        const skey = sys.utils.uint8ArrayToHex(ret.subarray(12, 32));
-
-        sys.require(skey != "", "illegal signature, verify fail");
+        const recoverResult = sys.hostApi.crypto.ecRecover(msgHash, BigInt.fromString(v, 16), BigInt.fromString(r, 16), BigInt.fromString(s, 16));
+        const ret = sys.utils.hexToUint8Array(recoverResult);
+        const sKey = sys.utils.uint8ArrayToHex(ret.subarray(12, 32));
+        sys.require(sKey != "", "illegal signature, verify fail");
 
         // 2. match session key from Aspect's state
         //        session keys in state are registered 
         const encodeSKey = sys.aspect.readonlyState(ctx).get<string>(
-            SessionKey.getStateKey(this.rmPrefix(ctx.tx.content.unwrap().to), from, skey)
+            SessionKey.getStateKey(this.rmPrefix(ctx.tx.content.unwrap().to), from, sKey)
         ).unwrap();
 
         sys.require(encodeSKey != "", "illegal session key");
@@ -331,9 +326,12 @@ export class Aspect implements  IAspectOperation, ITransactionVerifier {
             + r
             + s;
 
-        const ret = sys.hostApi.crypto._ecRecover(sys.utils.hexToUint8Array(syscallInput));
-        const signer = sys.utils.uint8ArrayToHex(ret.subarray(12, 32));
+        const sKey = sys.hostApi.crypto.ecRecover(hash, BigInt.fromString(v, 16), BigInt.fromString(r, 16), BigInt.fromString(s, 16));
 
+        sys.require(sKey != "", "illegal signature, verify fail");
+
+        const ret = sys.utils.hexToUint8Array(sKey);
+        const signer = sys.utils.uint8ArrayToHex(ret.subarray(12, 32));
         if (signer == "") {
             return false;
         }
@@ -350,15 +348,9 @@ export class Aspect implements  IAspectOperation, ITransactionVerifier {
     ecRecover_(hash: string, r: string, s: string, v: string): string {
 
         //[msgHash 32B][v 32B][r 32B][s 32B]
-        const syscallInput = hash
-            + "00000000000000000000000000000000000000000000000000000000000000" + v
-            + r
-            + s;
 
-        const ret = sys.hostApi.crypto._ecRecover(sys.utils.hexToUint8Array(syscallInput));
-        const retHex = sys.utils.uint8ArrayToHex(ret);
+        return sys.hostApi.crypto.ecRecover(hash, BigInt.fromString(v, 16), BigInt.fromString(r, 16), BigInt.fromString(s, 16));
 
-        return retHex;
     }
 
     // ***********************************
