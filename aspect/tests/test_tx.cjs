@@ -152,7 +152,7 @@ async function f() {
     console.log(`binding contract result:`);
     console.log(receipt);
 
-    let ret2 = await aspectCore.methods.boundAddressesOf(aspect.options.address).call({});
+    let ret2 = await aspectCore.methods.boundAddressesOf(aspect.options.address).call();
     console.log("binding result:", ret2)
 
     // ******************************************
@@ -181,7 +181,7 @@ async function f() {
     console.log(`binding EoA result:`);
     console.log(receipt);
 
-    ret2 = await aspectCore.methods.boundAddressesOf(aspect.options.address).call({});
+    ret2 = await aspectCore.methods.boundAddressesOf(aspect.options.address).call();
 
     console.log("binding result:", ret2)
 
@@ -330,7 +330,7 @@ async function f() {
         [validationData, contractCallData]);
 
     // new calldata: magic prefix + checksum(encodedData) + encodedData(validation data + raw calldata)
-    // 0xCAFECAFE is a magic prefix, 
+    // 0xCAFECAFE is a magic prefix,
     encodedData = '0xCAFECAFE' + web3.utils.keccak256(encodedData).slice(2, 10) + encodedData.slice(2);
     console.log("encodedData : ", encodedData);
     tx = {

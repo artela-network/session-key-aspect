@@ -12,7 +12,7 @@
     "asbuild:release": "asc assembly/index.ts --target release",
     "contract:bind": "node scripts/bind.cjs",
     "contract:deploy": "node scripts/contract-deploy.cjs",
-    "contract:build": "solc -o ./build/contract/ --via-ir --abi --storage-layout --bin ./test_contracts/*.sol --overwrite",
+    "contract:build": "solc -o ./build/contract/ --abi --storage-layout --bin ./test_contracts/*.sol --overwrite",
     "build": "npm run contract:build && npm run aspect:gen && npm run aspect:build",
     "test": "npm run build && node tests/test_operation.cjs && node tests/test_tx.cjs"
   },
@@ -20,11 +20,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@artela/aspect-libs": "0.0.29",
-    "@artela/web3": "^1.9.21",
-    "@artela/web3-atl": "^1.9.21",
-    "@artela/web3-eth": "^1.9.19",
-    "@artela/web3-utils": "^1.9.19",
+    "@artela/aspect-libs": "file:/Users/jack/Projects/js/aspect-tooling/packages/libs",
+    "@artela/web3": "file:/Users/jack/Projects/js/web3.js/packages/web3/lib",
+    "@artela/web3-atl": "file:/Users/jack/Projects/js/web3.js/packages/web3-atl/lib",
+    "@artela/web3-eth": "file:/Users/jack/Projects/js/web3.js/packages/web3-eth/lib",
+    "@artela/web3-utils": "file:/Users/jack/Projects/js/web3.js/packages/web3-utils/lib",
     "@assemblyscript/loader": "^0.27.5",
     "as-proto": "^1.3.0",
     "ethereumjs-tx": "^2.1.2"
@@ -33,7 +33,8 @@
     "@artela/aspect-tool": "^0.0.50",
     "as-proto-gen": "^1.3.0",
     "assemblyscript": "^0.27.5",
-    "yargs": "^17.7.2"
+    "yargs": "^17.7.2",
+    "bignumber.js": "^9.0.1"
   },
   "type": "module",
   "exports": {
