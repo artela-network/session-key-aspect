@@ -89,7 +89,7 @@ export class Aspect implements  IAspectOperation, ITransactionVerifier {
 
         // const currentBlockHeight = ctx.tx.content.unwrap().blockNumber;
         const expireBlockHeight = sKeyObj.getExpireBlockHeight();
-        const currentBlockHeight = blockNumber + 1;
+        const currentBlockHeight = blockNumber;
         sys.require(currentBlockHeight <= expireBlockHeight,
             "session key has expired; " + expireBlockHeight.toString() + " < " + currentBlockHeight.toString());
 
