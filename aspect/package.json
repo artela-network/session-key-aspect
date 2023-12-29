@@ -20,11 +20,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@artela/aspect-libs": "file:/Users/jack/Projects/js/aspect-tooling/packages/libs",
-    "@artela/web3": "file:/Users/jack/Projects/js/web3.js/packages/web3/lib",
-    "@artela/web3-atl": "file:/Users/jack/Projects/js/web3.js/packages/web3-atl/lib",
-    "@artela/web3-eth": "file:/Users/jack/Projects/js/web3.js/packages/web3-eth/lib",
-    "@artela/web3-utils": "file:/Users/jack/Projects/js/web3.js/packages/web3-utils/lib",
+    "@artela/aspect-libs": "0.0.30",
+    "@artela/web3": "1.9.22",
     "@assemblyscript/loader": "^0.27.5",
     "as-proto": "^1.3.0",
     "ethereumjs-tx": "^2.1.2"

@@ -27,7 +27,7 @@ import {Protobuf} from "as-proto/assembly/Protobuf";
  * * Function 'verifyTx': implements the session key verification logic.
  * * Function 'operation': implement the session key management logic. EoA call this function to register, update and delete its session keys.
  */
-export class Aspect implements  IAspectOperation, ITransactionVerifier {
+export class Aspect implements IAspectOperation, ITransactionVerifier {
 
     // ***************************************
     // interface methods
