@@ -193,7 +193,7 @@ function sendTransactionsAtFixedRate(txs, tps) {
             if (transactionIndex < totalTransactions) {
                 const tx = txs[transactionIndex++];
                 web3.eth.sendSignedTransaction(tx.raw).catch(e => {
-                    console.log("[send transaction]", "fail", transactionIndex, tx.tx.from, tx.tx.to, tx.tx.nonce, tx.tx.value)
+                    console.log("[send transaction]", "fail", transactionIndex, tx.tx.from, tx.tx.to, tx.tx.nonce, tx.tx.value, e)
                     assert(!tx.shouldFail, "[send transaction] transaction should not fail: " + e);
                     reject(e);
                 }).then(r => {
