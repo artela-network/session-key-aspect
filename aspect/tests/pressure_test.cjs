@@ -67,7 +67,7 @@ async function multiEoAWithMultiSessionKey() {
     for (let i = 0; i < accounts.length; i++) {
         txsToSend.push(await generateBindEoATx(aspect, accounts[i]));
     }
-    await sendTransactionsAtFixedRate(txsToSend, 10)
+    await sendTransactionsAtFixedRate(txsToSend, 2)
     console.log("[bind EoA with Aspect]", "done")
 
     console.log("[generate session key accounts]", skAccountNum)
@@ -87,7 +87,7 @@ async function multiEoAWithMultiSessionKey() {
         const eoaNonce = await web3.eth.getTransactionCount(accounts[i].address);
         txsToSend.push(await generateRegisterSessionKeyTx(aspect, accounts[i], eoaNonce, skAccounts[i], contract, contractCallMethod, expireBlockHeight));
     }
-    await sendTransactionsAtFixedRate(txsToSend, 10)
+    await sendTransactionsAtFixedRate(txsToSend, 2)
     console.log("[register session key]", "done")
 
     console.log("[send session key tx]", skAccountNum)
@@ -99,7 +99,7 @@ async function multiEoAWithMultiSessionKey() {
         }
         txsToSend.push(await generateSessionKeyTx(skAccounts[i], accounts[i], nonces[accounts[i].address]++, contract, contractCallData, false));
     }
-    await sendTransactionsAtFixedRate(txsToSend, 10)
+    await sendTransactionsAtFixedRate(txsToSend, 2)
     console.log("[send session key tx]", "done")
 }
 
@@ -123,7 +123,7 @@ async function oneEoAWithMultiSessionKey() {
     for (let i = 0; i < accounts.length; i++) {
         txsToSend.push(await generateBindEoATx(aspect, accounts[i]));
     }
-    await sendTransactionsAtFixedRate(txsToSend, 10)
+    await sendTransactionsAtFixedRate(txsToSend, 2)
     console.log("[bind EoA with Aspect]", "done")
 
     console.log("[generate session key accounts]", skAccountNum)
@@ -143,7 +143,7 @@ async function oneEoAWithMultiSessionKey() {
     for (let i = 0; i < skAccounts.length; i++) {
         txsToSend.push(await generateRegisterSessionKeyTx(aspect, accounts[0], eoaNonce++, skAccounts[i], contract, contractCallMethod, expireBlockHeight));
     }
-    await sendTransactionsAtFixedRate(txsToSend, 10)
+    await sendTransactionsAtFixedRate(txsToSend, 2)
     console.log("[register session key]", "done")
 
     console.log("[send session key tx]", skAccountNum)
@@ -177,7 +177,7 @@ async function generateAccounts(numAccounts, initialFund, nonce) {
         accounts.push(account);
     }
     if (fundingTxs.length > 0) {
-        await sendTransactionsAtFixedRate(fundingTxs, 10);
+        await sendTransactionsAtFixedRate(fundingTxs, 2);
     }
     return accounts;
 }
