@@ -156,6 +156,61 @@ async function oneEoAWithMultiSessionKey() {
     console.log("[send session key tx]", "done")
 }
 
+async function oneEoAWithOneSessionKey() {
+    let nonce = await web3.eth.getTransactionCount(mainAccount.address);
+
+    let contract = await deployContract(nonce++);
+    let aspect = await deployAspect(nonce++);
+
+    await bindAspect(aspect, contract, nonce++);
+
+    const eoaAccountNum = 1;
+    const skAccountNum = 1;
+
+    console.log("[generate EoA accounts]", eoaAccountNum)
+    let accounts = await generateAccounts(eoaAccountNum, "0.01", nonce);
+    console.log("[generate EoA accounts]", "done")
+
+    console.log("[bind EoA with Aspect]", eoaAccountNum)
+    let txsToSend = [];
+    for (let i = 0; i < accounts.length; i++) {
+        txsToSend.push(await generateBindEoATx(aspect, accounts[i]));
+    }
+    await sendTransactionsAtFixedRate(txsToSend, 4)
+    console.log("[bind EoA with Aspect]", "done")
+
+    console.log("[generate session key accounts]", skAccountNum)
+    nonce = await web3.eth.getTransactionCount(mainAccount.address);
+    let skAccounts = await generateAccounts(skAccountNum, 0, nonce);
+    console.log("[generate session key accounts]", "done")
+
+    let contractCallData = contract.methods.add([1]).encodeABI();
+    let contractCallMethod = rmPrefix(contractCallData).substring(0, 8);
+
+    let currentBlockHeight = await web3.eth.getBlockNumber();
+    let expireBlockHeight = currentBlockHeight + 10000000;
+
+    console.log("[register session key]", skAccountNum)
+    txsToSend = [];
+    let eoaNonce = await web3.eth.getTransactionCount(accounts[0].address);
+    for (let i = 0; i < skAccounts.length; i++) {
+        txsToSend.push(await generateRegisterSessionKeyTx(aspect, accounts[0], eoaNonce++, skAccounts[i], contract, contractCallMethod, expireBlockHeight));
+    }
+    await sendTransactionsAtFixedRate(txsToSend, 4)
+    console.log("[register session key]", "done")
+
+    console.log("[send session key tx]", skAccountNum)
+    while (true) {
+        txsToSend = [];
+        eoaNonce = await web3.eth.getTransactionCount(accounts[0].address);
+        for (let i = 0; i < 100; i++) {
+            txsToSend.push(await generateSessionKeyTx(skAccounts[0], accounts[0], eoaNonce++, contract, contractCallData, false));
+        }
+        await sendTransactionsAtFixedRate(txsToSend, 2)
+    }
+    console.log("[send session key tx]", "done")
+}
+
 async function generateAccounts(numAccounts, initialFund, nonce) {
     let accounts = [];
     let fundingTxs = [];
@@ -408,12 +463,13 @@ function padStart(str, targetLength, padString) {
 
 async function testEntry() {
     console.log("test start")
-    console.log("==== ⏳ multiEoAWithMultiSessionKey start ===");
-    await multiEoAWithMultiSessionKey();
-    console.log("==== ✅ multiEoAWithMultiSessionKey end ===");
-    console.log("==== ⏳ oneEoAWithMultiSessionKey start ===");
-    await oneEoAWithMultiSessionKey();
-    console.log("==== ✅ oneEoAWithMultiSessionKey end ===");
+    // console.log("==== ⏳ multiEoAWithMultiSessionKey start ===");
+    // await multiEoAWithMultiSessionKey();
+    // console.log("==== ✅ multiEoAWithMultiSessionKey end ===");
+    // console.log("==== ⏳ oneEoAWithMultiSessionKey start ===");
+    // await oneEoAWithMultiSessionKey();
+    // console.log("==== ✅ oneEoAWithMultiSessionKey end ===");
+    await oneEoAWithOneSessionKey();
 }
 
 async function preparation() {
