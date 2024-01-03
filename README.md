@@ -12,8 +12,11 @@ Session keys are able to **stand in for** EoA private key to sign a **specific t
 # Project Intro
 
 * Folder [aspect](https://github.com/artela-network/session-key-aspect/blob/main/aspect/README.md) implements the session key Aspect;
-* Folder [js_client](https://github.com/artela-network/session-key-aspect/blob/main/js_client/README.md) implements the session key Aspect javascript client.
+* Folder [js_client](https://github.com/artela-network/session-key-aspect/blob/main/js_client/session_key_aspect_client/README.md) implements the session key Aspect javascript client.
 
+# Integration
+* Bind session key Aspect to you contract by this [guide](https://github.com/artela-network/session-key-aspect/blob/main/aspect/README.md)
+* Integrate js client to you font-end dApp by this [guide](https://github.com/artela-network/session-key-aspect/blob/main/js_client/session_key_aspect_client/README.md)
 
 
 # Session-key Overview
