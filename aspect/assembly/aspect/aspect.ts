@@ -78,7 +78,7 @@ export class Aspect implements IAspectTransaction, IAspectOperation, ITransactio
             SessionKey.getStateKey(this.rmPrefix(ctx.tx.content.unwrap().to), from, skey)
         ).unwrap();
 
-        sys.require(encodeSKey != "", "illegal session key");
+        sys.require(encodeSKey != "", "illegal session key " + from + "-" + skey);
 
         // 2. match session key
         const sKeyObj = new SessionKey(encodeSKey);
