@@ -99,11 +99,11 @@ If a smart contract wants to bind any Aspect, it **MUST** implement the [isOwner
 
 #### **Bind Aspect**
 
-There are two ways to bind Aspects:
+There are three ways to bind Aspects:
 
 * Use `Aspect-tool` console command
 * Use `artela-web3.js` to call Aspect system contract
-
+* Use online [visual dashboard](https://session-key-aspect.vercel.app/) to bind Session key aspect to your contract
 
 
 #### **Use Aspect-tool**
@@ -156,6 +156,8 @@ await contract.bind({
 Learn more detailed steps in this [guide](https://docs.artela.network/develop/client/artela-web3.js#web3ethcontractbind).
 
 
+#### Use online visual dashboard
+Access https://session-key-aspect.vercel.app/ to bind your contract by metamask!
 
 
 
