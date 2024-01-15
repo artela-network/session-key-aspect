@@ -1,4 +1,6 @@
-const { Buffer } = require('buffer');
+import {Buffer} from 'buffer';
+import {LegacyTransaction as EthereumTx} from '@ethereumjs/tx';
+import BigNumber from 'bignumber.js';
 
 class SessionKeyAspectClient {
 
@@ -67,6 +69,56 @@ class SessionKeyAspectClient {
         }
 
         return tx;
+    }
+
+    async createUnsignTx(walletAddress, sKeyPrivKey, contractCallData, toAddress) {
+
+        let sKeyAccount = this.web3.eth.accounts.privateKeyToAccount(sKeyPrivKey);
+        let gasPrice = await this.web3.eth.getGasPrice();
+        let nonce = await this.web3.eth.getTransactionCount(walletAddress);
+        let chainId = await this.web3.eth.getChainId();
+
+        let gas = 8000000;
+        let gasLimit = 20000000;
+
+        let tx = {
+            from: sKeyAccount.address,
+            nonce: nonce,
+            gasPrice,
+            gas: 8000000,
+            data: contractCallData,
+            to: toAddress,
+            chainId,
+            gasLimit: gasLimit
+        }
+
+        let signedTx = await this.web3.eth.accounts.signTransaction(tx, sKeyPrivKey);
+
+        let validationData = "0x"
+            + walletAddress.slice(2)
+            + this.padStart(this.rmPrefix(signedTx.r), 64, "0")
+            + this.padStart(this.rmPrefix(signedTx.s), 64, "0")
+            + this.rmPrefix(this.getOriginalV(signedTx.v, chainId));
+
+        let encodedData = this.web3.eth.abi.encodeParameters(['bytes', 'bytes'],
+            [validationData, contractCallData]);
+
+        // new calldata: magic prefix + checksum(encodedData) + encodedData(validation data + raw calldata)
+        // 0xCAFECAFE is a magic prefix,
+        encodedData = '0xCAFECAFE' + this.web3.utils.keccak256(encodedData).slice(2, 10) + encodedData.slice(2);
+
+        tx = {
+            from: walletAddress,
+            nonce: this.toPaddedHexString(nonce),
+            gasPrice: this.toPaddedHexString(gasPrice),
+            gas: this.toPaddedHexString(gas),
+            data: encodedData,
+            to: toAddress,
+            chainId: this.toPaddedHexString(chainId),
+            gasLimit: this.toPaddedHexString(gasLimit),
+        }
+
+        return '0x' + this.bytesToHex(EthereumTx.fromTxData(tx).serialize());
     }
 
     async getSessionKey(walletAddress, sessionKeyAddress, bindingContractAddress) {
@@ -347,6 +399,43 @@ class SessionKeyAspectClient {
 
     rmPrefix(str) {
         return str.startsWith('0x') ? str.substring(2) : str;
+    }
+
+    bytesToHex(bytes) {
+        return bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '');
+    }
+
+    getOriginalV(hexV, chainId_) {
+        const v = new BigNumber(hexV, 16);
+        const chainId = new BigNumber(chainId_);
+        const chainIdMul = chainId.multipliedBy(2);
+        const originalV = v.minus(chainIdMul).minus(8);
+        return originalV.toString(16);
+    }
+
+    toPaddedHexString(num) {
+        let hex = num.toString(16);
+
+        if (hex.length % 2 !== 0) {
+            hex = '0' + hex;
+        }
+
+        return '0x' + hex;
+    }
+
+    padStart(str, targetLength, padString) {
+        targetLength = Math.max(targetLength, str.length);
+        padString = String(padString || ' ');
+
+        if (str.length >= targetLength) {
+            return str;
+        } else {
+            targetLength = targetLength - str.length;
+            if (targetLength > padString.length) {
+                padString += padString.repeat(targetLength / padString.length);
+            }
+            return padString.slice(0, targetLength) + str;
+        }
     }
 
     processAndConcatStrings(strings) {

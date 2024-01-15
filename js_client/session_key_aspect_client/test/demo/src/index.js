@@ -26,12 +26,12 @@ const artela = {
     symbol: 'ART',
   },
   rpcUrls: {
-    public: { http: ['https://testnet-rpc1.artela.network/'] },
-    default: { http: ['https://testnet-rpc1.artela.network/'] },
+    public: { http: ['https://betanet-rpc1.artela.network/'] },
+    default: { http: ['https://betanet-rpc1.artela.network/'] },
   },
   blockExplorers: {
-    default: { name: 'SnowTrace', url: 'https://testnet-scan.artela.network/' },
-    etherscan: { name: 'SnowTrace', url: 'https://testnet-scan.artela.network/' },
+    default: { name: 'SnowTrace', url: 'https://betanet-scan.artela.network/' },
+    etherscan: { name: 'SnowTrace', url: 'https://betanet-scan.artela.network/' },
   },
   testnet: false,
 };
