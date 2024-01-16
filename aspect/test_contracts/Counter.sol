@@ -17,7 +17,7 @@ contract Counter {
     function get() external view returns (uint256 result)  {
         return counter;
     }
-    
+
     // Vault Contract
     // 存储每个地址的余额
     mapping(address => uint) public balances;

@@ -1,6 +1,6 @@
 {
   "name": "sessioin-key-aspect-client",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "session key aspect client that provides session key management functionality",
   "main": "index.js",
   "scripts": {
@@ -24,9 +24,10 @@
   },
   "homepage": "https://github.com/artela-network/session-key-aspect#readme",
   "dependencies": {
-    "@artela/web3": "^1.9.18",
+    "@artela/web3": "^1.9.22",
     "buffer": "^6.0.3",
-    "web3": "^4.3.0"
+    "web3": "^4.3.0",
+    "@ethereumjs/tx": "^5.1.0"
   },
   "devDependencies": {
     "webpack": "^5.89.0",

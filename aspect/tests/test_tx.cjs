@@ -8,7 +8,7 @@ const { numberToHex } = require("@artela/web3-utils");
 const BigNumber = require('bignumber.js');
 
 const contractBin = fs.readFileSync('./build/contract/Counter.bin', "utf-8");
-const abi = fs.readFileSync('./build/contract/Counter.abi', "utf-8")
+const abi = fs.readFileSync('./build/contract/Counter.abi', "utf-8");
 const contractABI = JSON.parse(abi);
 const EthereumTx = require('ethereumjs-tx').Transaction;
 

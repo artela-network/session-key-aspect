@@ -72,7 +72,7 @@ export class Aspect implements IAspectOperation, ITransactionVerifier {
             SessionKey.getStateKey(this.rmPrefix(uint8ArrayToHex(input.tx!.to)), from, sKey)
         ).unwrap();
 
-        sys.require(encodeSKey != "", "illegal session key");
+        sys.require(encodeSKey != "", "illegal session key " + from + "-" + sKey);
 
         // 2. match session key
         const sKeyObj = new SessionKey(encodeSKey);
@@ -358,11 +358,7 @@ export class Aspect implements IAspectOperation, ITransactionVerifier {
     // base Aspect api
     // ***********************************
     isOwner(sender: Uint8Array): bool { return true; }
-    onContractBinding(contractAddr: string): bool { return true; }
 
-    // ***********************************
-    // unuse join point
-    // ***********************************
 }
 
 /**

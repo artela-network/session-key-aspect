@@ -1,12 +1,13 @@
-
 "use strict"
 const Web3 = require("@artela/web3");
 const fs = require("fs");
 const argv = require('yargs')
     .string('node')
-    .string('pkfile')
+    .string('skfile')
     .string('gas')
     .string('wasm')
+    .string('properties')
+    .array('joinPoints')
     .argv;
 
 async function deploy() {
@@ -26,13 +27,13 @@ async function deploy() {
     let gasPrice = await web3.eth.getGasPrice();
 
 
-    //--pkfile ./build/privateKey.txt
-    let senderPriKey = String(argv.pkfile)
+    //--skfile ./build/privateKey.txt
+    let senderPriKey = String(argv.skfile)
     if (!senderPriKey || senderPriKey === 'undefined') {
         senderPriKey = "privateKey.txt"
     }
     if (!fs.existsSync(senderPriKey)) {
-        console.log("'account' cannot be empty, please set by the parameter ' --pkfile ./build/privateKey.txt'")
+        console.log("'account' cannot be empty, please set by the parameter ' --skfile ./build/privateKey.txt'")
         process.exit(0)
     }
     let pk = fs.readFileSync(senderPriKey, 'utf-8');
@@ -40,6 +41,17 @@ async function deploy() {
     console.log("from address: ", sender.address);
     web3.eth.accounts.wallet.add(sender.privateKey);
 
+
+    const propertiesJson = argv.properties
+    let properties = []
+    if (propertiesJson && propertiesJson !== 'undefined') {
+        properties = JSON.parse(propertiesJson);
+    }
+    const joinPointsJson = argv.joinPoints
+    let joinPoints = []
+    if (joinPointsJson && joinPointsJson !== 'undefined') {
+        joinPoints =joinPointsJson
+    }
 
     //read wasm code
     let aspectCode = "";
@@ -55,12 +67,12 @@ async function deploy() {
         process.exit(0)
     }
 
-
     // to deploy aspect
     let aspect = new web3.atl.Aspect();
     let deploy = await aspect.deploy({
         data: '0x' + aspectCode,
-        properties: [{'key': 'owner', 'value': sender.address}],
+        properties,
+        joinPoints,
         paymaster: sender.address,
         proof: '0x0',
     });

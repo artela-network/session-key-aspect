@@ -25,7 +25,7 @@ Init `SessionKeyAspectClient`
 
 ```js
 // 1. init web3 client
-const testnetRpc = "https://testnet-rpc1.artela.network"
+const testnetRpc = "https://betanet-rpc1.artela.network"
 const web3 = new Web3(testnetRpc);	
 
 // 2. init session key client
