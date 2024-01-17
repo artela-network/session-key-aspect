@@ -62,6 +62,9 @@ async function f() {
     let sk = fs.readFileSync("privateKey.txt", 'utf-8');
     const account = web3.eth.accounts.privateKeyToAccount(sk.trim());
     web3.eth.accounts.wallet.add(account.privateKey);
+    const balance = await web3.eth.getBalance(account.address);
+    console.log("node:" + configJson.node + " sender:"+account.address+" balance:"+balance)
+
 
     let gasPrice = await web3.eth.getGasPrice();
     let chainId = await web3.eth.getChainId();

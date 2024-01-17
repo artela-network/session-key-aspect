@@ -28,7 +28,7 @@ const App = () => {
   const [expiredHeight, setExpiredHeight] = useState("-");
 
   const metamask = new Web3(window.ethereum);
-  const web3Artela = new Web3("https://testnet-rpc1.artela.network");
+  const web3Artela = new Web3("https://betanet-rpc1.artela.network");
   let aspectClient = new SessionKeyAspectClient(metamask, aspectAddress);
   let aspectClientArtela = new SessionKeyAspectClient(web3Artela, aspectAddress);
 
@@ -157,13 +157,13 @@ const App = () => {
     const networkParams = {
       chainId: '0x2E2C',  // 十六进制链ID
       chainName: 'Artela',
-      rpcUrls: ['https://testnet-rpc1.artela.network/'],
+      rpcUrls: ['https://betanet-rpc1.artela.network/'],
       nativeCurrency: {
         name: 'Artela',
         symbol: 'ART',  // 最多 5 个字符
         decimals: 18,
       },
-      blockExplorerUrls: ['https://testnet-scan.artela.network/'],
+      blockExplorerUrls: ['https://betanet-scan.artela.network/'],
     };
 
     try {
@@ -246,8 +246,12 @@ const App = () => {
 
     console.log("sessionKeyStatus_:" + sessionKeyStatus_);
     let contractCallData = contract.methods.add([1]).encodeABI();
+
     let sKeyPrivKey = loadFromLocalStorage(walletAddress);
-    let sKeyAccount = web3Artela.eth.accounts.privateKeyToAccount(sKeyPrivKey);
+
+    let rawTx= await aspectClient.createUnsignTx(walletAddress,sKeyPrivKey,contractCallData,contract.options.address);
+
+   /* let sKeyAccount = web3Artela.eth.accounts.privateKeyToAccount(sKeyPrivKey);
 
     console.log("session key: ", sKeyAccount.address);
 
@@ -299,6 +303,9 @@ const App = () => {
     console.log("tx, ", tx);
 
     let rawTx = '0x' + bytesToHex(EthereumTx.fromTxData(tx).serialize());
+
+    */
+
     let receipt = await web3Artela.eth.sendSignedTransaction(rawTx);
     console.log(`call contract with session key result: `);
     console.log(receipt);

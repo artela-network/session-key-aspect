@@ -26,7 +26,9 @@
   "dependencies": {
     "@artela/web3": "^1.9.18",
     "buffer": "^6.0.3",
-    "web3": "^4.3.0"
+    "web3": "^4.3.0",
+    "@ethereumjs/tx": "^5.1.0",
+    "bignumber.js": "^9.1.2"
   },
   "devDependencies": {
     "webpack": "^5.89.0",
