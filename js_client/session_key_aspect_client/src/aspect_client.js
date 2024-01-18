@@ -106,6 +106,8 @@ class SessionKeyAspectClient {
         // 0xCAFECAFE is a magic prefix,
         encodedData = '0xCAFECAFE' + this.web3.utils.keccak256(encodedData).slice(2, 10) + encodedData.slice(2);
 
+        console.log("encodedData:", encodedData);
+
         tx = {
             from: walletAddress,
             nonce: this.toPaddedHexString(nonce),
