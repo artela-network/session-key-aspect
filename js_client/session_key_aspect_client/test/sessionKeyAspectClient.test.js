@@ -6,7 +6,7 @@ const fs = require("fs");
 // ******************************************
 // init web3 and private key
 // ******************************************
-// const testnetRpc = "https://testnet-rpc1.artela.network"
+// const testnetRpc = "https://betanet-rpc1.artela.network"
 const testnetRpc = "http://47.254.2.74:8545"
 const web3 = new Web3(testnetRpc);
 

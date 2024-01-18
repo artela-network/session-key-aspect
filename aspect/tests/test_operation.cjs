@@ -58,6 +58,7 @@ async function deployAspect() {
     let aspectDeployData = aspect.deploy({
         data: '0x' + aspectCode,
         properties: [],
+        joinPoints: ["VerifyTx"],
         paymaster: account.address,
         proof: '0x0'
     }).encodeABI();

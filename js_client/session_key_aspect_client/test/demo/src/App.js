@@ -11,10 +11,10 @@ const SessionKeyAspectClient = require('sessioin-key-aspect-client');
 
 const App = () => {
 
-  const testContract = "0x6D33Ba9cDfc695f498c0C78990125dbF9C55c70f";
+  const testContract = "0xfa3C63608f612D03e269D1E6c368a2b8A9b8aAb7";
   const testContractAbi = [{ "inputs": [], "stateMutability": "nonpayable", "type": "constructor" }, { "inputs": [{ "internalType": "uint256", "name": "number", "type": "uint256" }], "name": "add", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "get", "outputs": [{ "internalType": "uint256", "name": "result", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "user", "type": "address" }], "name": "isOwner", "outputs": [{ "internalType": "bool", "name": "result", "type": "bool" }], "stateMutability": "view", "type": "function" }];
   const testMethods = "0x1003e2d2";
-  const testAspectAddress = "0xcFed98CC44654188539B356AB8257380f914E118";
+  const testAspectAddress = "0x9639aEa2F55E44a5B352A62C80976faE574b7d97";
 
   const [aspectAddress, setAspectAddress] = useState(testAspectAddress);
 
@@ -29,6 +29,7 @@ const App = () => {
 
   const metamask = new Web3(window.ethereum);
   const web3Artela = new Web3("https://betanet-rpc1.artela.network");
+ // const web3Artela = new Web3("http://127.0.0.1:8545");
   let aspectClient = new SessionKeyAspectClient(metamask, aspectAddress);
   let aspectClientArtela = new SessionKeyAspectClient(web3Artela, aspectAddress);
 
@@ -246,65 +247,9 @@ const App = () => {
 
     console.log("sessionKeyStatus_:" + sessionKeyStatus_);
     let contractCallData = contract.methods.add([1]).encodeABI();
-
     let sKeyPrivKey = loadFromLocalStorage(walletAddress);
 
     let rawTx= await aspectClient.createUnsignTx(walletAddress,sKeyPrivKey,contractCallData,contract.options.address);
-
-   /* let sKeyAccount = web3Artela.eth.accounts.privateKeyToAccount(sKeyPrivKey);
-
-    console.log("session key: ", sKeyAccount.address);
-
-    let gasPrice = await web3Artela.eth.getGasPrice();
-    let nonce = await web3Artela.eth.getTransactionCount(walletAddress);
-    let chainId = await web3Artela.eth.getChainId();
-
-    let gas = 8000000;
-    let gasLimit = 20000000;
-
-    let tx = {
-      from: sKeyAccount.address,
-      nonce: nonce,
-      gasPrice,
-      gas: 8000000,
-      data: contractCallData,
-      to: contract.options.address,
-      chainId,
-      gasLimit: gasLimit
-    }
-
-    let signedTx = await web3Artela.eth.accounts.signTransaction(tx, sKeyPrivKey);
-    console.log("sign tx : ", signedTx);
-
-    let validationData = "0x"
-      + walletAddress.slice(2)
-      + padStart(rmPrefix(signedTx.r), 64, "0")
-      + padStart(rmPrefix(signedTx.s), 64, "0")
-      + rmPrefix(getOriginalV(signedTx.v, chainId));
-
-    let encodedData = web3Artela.eth.abi.encodeParameters(['bytes', 'bytes'],
-      [validationData, contractCallData]);
-
-    // new calldata: magic prefix + checksum(encodedData) + encodedData(validation data + raw calldata)
-    // 0xCAFECAFE is a magic prefix, 
-    encodedData = '0xCAFECAFE' + web3Artela.utils.keccak256(encodedData).slice(2, 10) + encodedData.slice(2);
-
-    tx = {
-      from: walletAddress,
-      nonce: toPaddedHexString(nonce),
-      gasPrice: toPaddedHexString(gasPrice),
-      gas: toPaddedHexString(gas),
-      data: encodedData,
-      to: contract.options.address,
-      chainId: toPaddedHexString(chainId),
-      gasLimit: toPaddedHexString(gasLimit),
-    }
-
-    console.log("tx, ", tx);
-
-    let rawTx = '0x' + bytesToHex(EthereumTx.fromTxData(tx).serialize());
-
-    */
 
     let receipt = await web3Artela.eth.sendSignedTransaction(rawTx);
     console.log(`call contract with session key result: `);
@@ -314,53 +259,7 @@ const App = () => {
     syncSKeyStatus();
   };
 
-  function toPaddedHexString(num) {
-    let hex = num.toString(16);
 
-    if (hex.length % 2 !== 0) {
-      hex = '0' + hex;
-    }
-
-    return '0x' + hex;
-  }
-
-  function getOriginalV(hexV, chainId_) {
-    const v = new BigNumber(hexV, 16);
-    const chainId = new BigNumber(chainId_);
-    const chainIdMul = chainId.multipliedBy(2);
-
-    const originalV = v.minus(chainIdMul).minus(8);
-
-    const originalVHex = originalV.toString(16);
-
-    return originalVHex;
-  }
-
-  function rmPrefix(data) {
-    if (data.startsWith('0x')) {
-      return data.substring(2, data.length);
-    } else {
-      return data;
-    }
-  }
-  function padStart(str, targetLength, padString) {
-    targetLength = Math.max(targetLength, str.length);
-    padString = String(padString || ' ');
-
-    if (str.length >= targetLength) {
-      return str;
-    } else {
-      targetLength = targetLength - str.length;
-      if (targetLength > padString.length) {
-        padString += padString.repeat(targetLength / padString.length);
-      }
-      return padString.slice(0, targetLength) + str;
-    }
-  }
-
-  function bytesToHex(bytes) {
-    return bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '');
-  }
 
   return (
     <div>

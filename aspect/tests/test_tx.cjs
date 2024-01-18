@@ -107,6 +107,7 @@ async function f() {
     let aspectDeployData = aspect.deploy({
         data: '0x' + aspectCode,
         properties: [],
+        joinPoints:["VerifyTx"],
         paymaster: account.address,
         proof: '0x0'
     }).encodeABI();
@@ -154,7 +155,7 @@ async function f() {
     console.log(`binding contract result:`);
     console.log(receipt);
 
-    let ret2 = await aspectCore.methods.contractsOf(aspect.options.address).call({});
+    let ret2 = await aspectCore.methods.boundAddressesOf(aspect.options.address).call();
     console.log("binding result:", ret2)
 
     // ******************************************
@@ -183,7 +184,7 @@ async function f() {
     console.log(`binding EoA result:`);
     console.log(receipt);
 
-    ret2 = await aspectCore.methods.contractsOf(aspect.options.address).call({});
+    ret2 = await aspectCore.methods.boundAddressesOf(aspect.options.address).call();
 
     console.log("binding result:", ret2)
 
@@ -332,11 +333,11 @@ async function f() {
         [validationData, contractCallData]);
 
     // new calldata: magic prefix + checksum(encodedData) + encodedData(validation data + raw calldata)
-    // 0xCAFECAFE is a magic prefix, 
+    // 0xCAFECAFE is a magic prefix,
     encodedData = '0xCAFECAFE' + web3.utils.keccak256(encodedData).slice(2, 10) + encodedData.slice(2);
-
+    console.log("encodedData : ", encodedData);
     tx = {
-        from: sKeyAccount.address,
+       // from: sKeyAccount.address,
         nonce: numberToHex(nonce - 1),
         gasPrice: numberToHex(gasPrice),
         gas: numberToHex(8000000),
@@ -345,6 +346,11 @@ async function f() {
         chainId: numberToHex(chainId)
     }
 
+    let aspectRet2 = await aspectCore.methods.aspectsOf(contract.options.address).call({});
+    console.log("contract bind result:", contract.options.address,aspectRet2)
+
+
+    // wait for block committing
     let rawTx = '0x' + new EthereumTx(tx).serialize().toString('hex');
     receipt = await web3.eth.sendSignedTransaction(rawTx);
     console.log(`call contract with session key result: `);
