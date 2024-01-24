@@ -7,7 +7,7 @@ const SessionKeyAspectClient = require('sessioin-key-aspect-client');
 const App = () => {
 
   const testMethods = "0A0A0A0A,0B0B0B0B";
-  const testAspectAddress = "0x3f2CdeA0c24dF0A37Df11766450C9c6335486EC8";
+  const testAspectAddress = "0x9639aEa2F55E44a5B352A62C80976faE574b7d97";
 
   const [aspectAddress, setAspectAddress] = useState(testAspectAddress);
   const [walletAddress, setWalletAddress] = useState('');

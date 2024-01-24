@@ -15,7 +15,7 @@ import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { publicProvider } from 'wagmi/providers/public';
 
 const artela = {
-  id: 11820,
+  id: 11822,
   name: 'Artela',
   network: 'artela-testnet-2',
   iconUrl: 'https://framerusercontent.com/images/xLv7JZ8nzPaZ9zk7j63YbRZHqY.png',
