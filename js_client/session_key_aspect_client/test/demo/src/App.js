@@ -156,7 +156,7 @@ const App = () => {
     }
 
     const networkParams = {
-      chainId: '0x2E2C',  // 十六进制链ID
+      chainId: '0x2E2E',  // 十六进制链ID
       chainName: 'Artela',
       rpcUrls: ['https://betanet-rpc1.artela.network/'],
       nativeCurrency: {
