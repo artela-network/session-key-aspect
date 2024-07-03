@@ -2,13 +2,15 @@
 
 //todo modify it
 
+const path = require('path');
 const Web3 = require('@artela/web3');
 const fs = require("fs");
 const { numberToHex } = require("@artela/web3-utils");
 const BigNumber = require('bignumber.js');
 
-const contractBin = fs.readFileSync('./build/contract/Counter.bin', "utf-8");
-const abi = fs.readFileSync('./build/contract/Counter.abi', "utf-8");
+const workingDir = "./";
+const contractBin = fs.readFileSync(path.join(workingDir, 'build/contract/Counter.bin'), "utf-8");
+const abi = fs.readFileSync(path.join(workingDir, '/build/contract/Counter.abi'), "utf-8");
 const contractABI = JSON.parse(abi);
 const EthereumTx = require('ethereumjs-tx').Transaction;
 
@@ -56,14 +58,14 @@ async function f() {
     // ******************************************
     // init web3 and private key
     // ******************************************
-    const configJson = JSON.parse(fs.readFileSync('./project.config.json', "utf-8").toString());
+    const configJson = JSON.parse(fs.readFileSync(path.join(workingDir, '/project.config.json'), "utf-8").toString());
     const web3 = new Web3(configJson.node);
 
-    let sk = fs.readFileSync("privateKey.txt", 'utf-8');
+    let sk = fs.readFileSync(path.join(workingDir, "privateKey.txt"), 'utf-8');
     const account = web3.eth.accounts.privateKeyToAccount(sk.trim());
     web3.eth.accounts.wallet.add(account.privateKey);
     const balance = await web3.eth.getBalance(account.address);
-    console.log("node:" + configJson.node + " sender:"+account.address+" balance:"+balance)
+    console.log("node:" + configJson.node + " sender:" + account.address + " balance:" + balance)
 
 
     let gasPrice = await web3.eth.getGasPrice();
@@ -76,13 +78,13 @@ async function f() {
     // ******************************************
 
     let contract = new web3.eth.Contract(contractABI);
-    let deployData = contract.deploy(demoContractOptions).encodeABI();
+    let deploy = contract.deploy(demoContractOptions);
     let tx = {
         from: account.address,
         nonce: nonce++,
         gasPrice,
-        gas: 4000000,
-        data: deployData,
+        gas: await deploy.estimateGas({ from: account.address }),
+        data: deploy.encodeABI(),
         chainId
     }
 
@@ -98,27 +100,27 @@ async function f() {
     // ******************************************
 
     // load aspect code and deploy
-    let aspectCode = fs.readFileSync('./build/release.wasm', {
+    let aspectCode = fs.readFileSync(path.join(workingDir, 'build/release.wasm'), {
         encoding: "hex"
     });
 
     // instantiate an instance of aspect
     let aspect = new web3.atl.Aspect();
-    let aspectDeployData = aspect.deploy({
+    let aspectDeploy = aspect.deploy({
         data: '0x' + aspectCode,
         properties: [],
-        joinPoints:["VerifyTx"],
+        joinPoints: ["VerifyTx"],
         paymaster: account.address,
         proof: '0x0'
-    }).encodeABI();
+    });
 
     tx = {
         from: account.address,
         nonce: nonce++,
         gasPrice,
-        gas: 4000000,
+        gas: await aspectDeploy.estimateGas({ from: account.address }),
         to: aspectCore.options.address,
-        data: aspectDeployData,
+        data: aspectDeploy.encodeABI(),
         chainId
     }
 
@@ -134,18 +136,18 @@ async function f() {
     // ******************************************
 
     // binding with smart contract
-    let contractBindingData = await contract.bind({
+    let contractBinding = await contract.bind({
         priority: 1,
         aspectId: aspect.options.address,
         aspectVersion: 1,
-    }).encodeABI();
+    });
 
     tx = {
         from: account.address,
         nonce: nonce++,
         gasPrice,
-        gas: 4000000,
-        data: contractBindingData,
+        gas: await contractBinding.estimateGas({ from: account.address }),
+        data: contractBinding.encodeABI(),
         to: aspectCore.options.address,
         chainId
     }
@@ -167,14 +169,14 @@ async function f() {
     // ******************************************
 
     // binding with EoA
-    let eoaBindingData = await aspectCore.methods.bind(aspect.options.address, 1, account.address, 1).encodeABI();
+    let eoaBinding = await aspectCore.methods.bind(aspect.options.address, 1, account.address, 1);
 
     tx = {
         from: account.address,
         nonce: nonce++,
         gasPrice,
-        gas: 4000000,
-        data: eoaBindingData,
+        gas: await eoaBinding.estimateGas({ from: account.address }),
+        data: eoaBinding.encodeABI(),
         to: aspectCore.options.address,
         chainId
     }
@@ -202,7 +204,8 @@ async function f() {
     let sKey = rmPrefix(sKeyAccount.address);
     let sKeyContract = rmPrefix(contract.options.address);
 
-    let contractCallData = contract.methods.add([1]).encodeABI();
+    let contractCall = contract.methods.add([1]);
+    let contractCallData = contractCall.encodeABI();
     let contractCallMethod = rmPrefix(contractCallData).substring(0, 8);
 
     console.log("\n\n" +
@@ -230,7 +233,10 @@ async function f() {
         from: account.address,
         nonce: nonce++,
         gasPrice,
-        gas: 8000000,
+        // TODO 1: estimated gas is not enough
+        // gas: await web3.eth.estimateGas({ from: account.address, data: sessionKeyRegData, to: aspectCore.options.address }),
+        // gas: 177440,
+        gas: 400000,
         data: sessionKeyRegData,
         to: aspectCore.options.address,
         chainId
@@ -276,7 +282,7 @@ async function f() {
         from: account.address,
         nonce: nonce++,
         gasPrice,
-        gas: 8000000,
+        gas: await contractCall.estimateGas({ from: account.address }),
         data: contractCallData,
         to: contract.options.address,
         chainId
@@ -305,6 +311,8 @@ async function f() {
         from: sKeyAccount.address,
         nonce: nonce++,
         gasPrice,
+        // gas: await contractCall.estimateGas({ from: account.address }),
+        // TODO 2: cannot use estimated here, must keep same with the value with next tx??
         gas: 8000000,
         data: contractCallData,
         to: contract.options.address,
@@ -337,9 +345,11 @@ async function f() {
     encodedData = '0xCAFECAFE' + web3.utils.keccak256(encodedData).slice(2, 10) + encodedData.slice(2);
     console.log("encodedData : ", encodedData);
     tx = {
-       // from: sKeyAccount.address,
+        // from: sKeyAccount.address,
         nonce: numberToHex(nonce - 1),
         gasPrice: numberToHex(gasPrice),
+        // TODO 3: not able to estimate gas
+        // gas: numberToHex(await web3.eth.estimateGas({ from: sKeyAccount.address, data: encodedData, to: contract.options.address })),
         gas: numberToHex(8000000),
         data: encodedData,
         to: contract.options.address,
@@ -347,7 +357,7 @@ async function f() {
     }
 
     let aspectRet2 = await aspectCore.methods.aspectsOf(contract.options.address).call({});
-    console.log("contract bind result:", contract.options.address,aspectRet2)
+    console.log("contract bind result:", contract.options.address, aspectRet2)
 
 
     // wait for block committing
@@ -368,7 +378,7 @@ async function f() {
         from: sKeyAccount.address,
         nonce: nonce++,
         gasPrice,
-        gas: 8000000,
+        gas: await contractCall.estimateGas({ from: account.address }),
         data: contractCallData,
         to: contract.options.address,
         chainId
@@ -392,6 +402,7 @@ async function f() {
         from: sKeyAccount.address,
         nonce: numberToHex(nonce - 1),
         gasPrice: numberToHex(gasPrice),
+        // gas: numberToHex(await web3.eth.estimateGas({ from: sKeyAccount.address, data: encodedData, to: contract.options.address })),
         gas: numberToHex(8000000),
         data: encodedData,
         to: contract.options.address,
