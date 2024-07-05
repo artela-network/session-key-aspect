@@ -233,9 +233,7 @@ async function f() {
         from: account.address,
         nonce: nonce++,
         gasPrice,
-        // TODO 1: estimated gas is not enough
-        // gas: await web3.eth.estimateGas({ from: account.address, data: sessionKeyRegData, to: aspectCore.options.address }),
-        // gas: 177440,
+        gas: await web3.eth.estimateGas({ from: account.address, data: sessionKeyRegData, to: aspectCore.options.address }),
         gas: 400000,
         data: sessionKeyRegData,
         to: aspectCore.options.address,
@@ -311,9 +309,7 @@ async function f() {
         from: sKeyAccount.address,
         nonce: nonce++,
         gasPrice,
-        // gas: await contractCall.estimateGas({ from: account.address }),
-        // TODO 2: cannot use estimated here, must keep same with the value with next tx??
-        gas: 8000000,
+        gas: await contractCall.estimateGas({ from: account.address }),
         data: contractCallData,
         to: contract.options.address,
         chainId
@@ -348,9 +344,7 @@ async function f() {
         // from: sKeyAccount.address,
         nonce: numberToHex(nonce - 1),
         gasPrice: numberToHex(gasPrice),
-        // TODO 3: not able to estimate gas
-        // gas: numberToHex(await web3.eth.estimateGas({ from: sKeyAccount.address, data: encodedData, to: contract.options.address })),
-        gas: numberToHex(8000000),
+        gas: numberToHex(await web3.eth.estimateGas({ from: sKeyAccount.address, data: encodedData, to: contract.options.address })),
         data: encodedData,
         to: contract.options.address,
         chainId: numberToHex(chainId)
@@ -403,7 +397,7 @@ async function f() {
         nonce: numberToHex(nonce - 1),
         gasPrice: numberToHex(gasPrice),
         // gas: numberToHex(await web3.eth.estimateGas({ from: sKeyAccount.address, data: encodedData, to: contract.options.address })),
-        gas: numberToHex(8000000),
+        gas: numberToHex(800000),
         data: encodedData,
         to: contract.options.address,
         chainId: numberToHex(chainId)
