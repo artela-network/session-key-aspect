@@ -9,11 +9,12 @@ import {
     stringToUint8Array,
     sys,
     TxVerifyInput,
+    Uint256,
     uint8ArrayToHex,
     UintData,
 } from "@artela/aspect-libs";
 
-import {Protobuf} from "as-proto/assembly/Protobuf";
+import { Protobuf } from "as-proto/assembly/Protobuf";
 
 /**
  * Brief intro:
@@ -59,10 +60,9 @@ export class Aspect implements IAspectOperation, ITransactionVerifier {
         // 1. verify sig
         const rawUnsignedHash = sys.hostApi.runtimeContext.get("tx.unsigned.hash");
         const unsignedHash = Protobuf.decode<BytesData>(rawUnsignedHash, BytesData.decode);
-        const msgHash = this.rmPrefix(uint8ArrayToHex(unsignedHash.data));
+        // const msgHash = this.rmPrefix(uint8ArrayToHex(unsignedHash.data));
 
-        const recoverResult = sys.hostApi.crypto.ecRecover(msgHash, BigInt.fromString(v, 16), BigInt.fromString(r, 16), BigInt.fromString(s, 16));
-        const ret = hexToUint8Array(recoverResult);
+        const ret = sys.hostApi.crypto.ecRecover(unsignedHash.data, Uint256.fromHex(v), Uint256.fromHex(r), Uint256.fromHex(s));
         const sKey = uint8ArrayToHex(ret.subarray(12, 32));
         sys.require(sKey != "", "illegal signature, verify fail");
 
@@ -141,8 +141,7 @@ export class Aspect implements IAspectOperation, ITransactionVerifier {
             return ret ? stringToUint8Array("success") : stringToUint8Array("false");
         }
         else if (op == "1004") {
-            const ret = this.ecRecover(params);
-            return stringToUint8Array(ret);
+            return this.ecRecover(params);
         }
         else if (op == "1005") {
             const ret = this.getAllSessionKey(params);
@@ -288,7 +287,7 @@ export class Aspect implements IAspectOperation, ITransactionVerifier {
         return this.verifySignature_(from, to, hash, r, s, v);
     }
 
-    ecRecover(params: string): string {
+    ecRecover(params: string): Uint8Array {
         // params encode rules:
         //     20 bytes: from
         //         eg. e2f8857467b61f2e4b1a614a0d560cd75c0c076f
@@ -327,11 +326,10 @@ export class Aspect implements IAspectOperation, ITransactionVerifier {
             + r
             + s;
 
-        const sKey = sys.hostApi.crypto.ecRecover(hash, BigInt.fromString(v, 16), BigInt.fromString(r, 16), BigInt.fromString(s, 16));
+        const ret = sys.hostApi.crypto.ecRecover(hexToUint8Array(hash), Uint256.fromHex(v), Uint256.fromHex(r), Uint256.fromHex(s));
 
-        sys.require(sKey != "", "illegal signature, verify fail");
+        sys.require(ret.length > 0, "illegal signature, verify fail");
 
-        const ret = hexToUint8Array(sKey);
         const signer = uint8ArrayToHex(ret.subarray(12, 32));
         if (signer == "") {
             return false;
@@ -346,11 +344,11 @@ export class Aspect implements IAspectOperation, ITransactionVerifier {
         return true;
     }
 
-    ecRecover_(hash: string, r: string, s: string, v: string): string {
+    ecRecover_(hash: string, r: string, s: string, v: string): Uint8Array {
 
         //[msgHash 32B][v 32B][r 32B][s 32B]
 
-        return sys.hostApi.crypto.ecRecover(hash, BigInt.fromString(v, 16), BigInt.fromString(r, 16), BigInt.fromString(s, 16));
+        return sys.hostApi.crypto.ecRecover(hexToUint8Array(hash), Uint256.fromHex(v), Uint256.fromHex(r), Uint256.fromHex(s));
 
     }
 
