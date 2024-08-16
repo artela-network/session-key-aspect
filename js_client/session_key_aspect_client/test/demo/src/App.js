@@ -11,10 +11,10 @@ const SessionKeyAspectClient = require('sessioin-key-aspect-client');
 
 const App = () => {
 
-  const testContract = "0xfa3C63608f612D03e269D1E6c368a2b8A9b8aAb7";
+  const testContract = "0xA19A094b2D912D9FEB42Ce4148773Ecf0fc98EAa";
   const testContractAbi = [{ "inputs": [], "stateMutability": "nonpayable", "type": "constructor" }, { "inputs": [{ "internalType": "uint256", "name": "number", "type": "uint256" }], "name": "add", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "get", "outputs": [{ "internalType": "uint256", "name": "result", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "user", "type": "address" }], "name": "isOwner", "outputs": [{ "internalType": "bool", "name": "result", "type": "bool" }], "stateMutability": "view", "type": "function" }];
   const testMethods = "0x1003e2d2";
-  const testAspectAddress = "0x9639aEa2F55E44a5B352A62C80976faE574b7d97";
+  const testAspectAddress = "0xA901631341c52De56F4DFA571dcBaEb0b13017FD";
 
   const [aspectAddress, setAspectAddress] = useState(testAspectAddress);
 
