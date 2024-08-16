@@ -78,7 +78,7 @@ class SessionKeyAspectClient {
         let chainId = await this.web3.eth.getChainId();
 
         let gas = 8000000;
-        let gasLimit = 20000000;
+        let gasLimit = 8000000;
 
         let tx = {
             from: sKeyAccount.address,
@@ -342,18 +342,18 @@ class SessionKeyAspectClient {
 
     decodeSessionKey(encodeKey) {
         // * SessionKey encode rules:
-        // *      20 bytes: session key public key 
+        // *      20 bytes: session key public key
         // *           eg. 1f9090aaE28b8a3dCeaDf281B0F12828e676c326
-        // *      20 bytes: contract address 
+        // *      20 bytes: contract address
         // *           eg. 388C818CA8B9251b393131C08a736A67ccB19297
         // *      2 bytes: length of methods set
         // *           eg. 0002
-        // *      variable-length: 4 bytes * length of methods set; methods set          
+        // *      variable-length: 4 bytes * length of methods set; methods set
         // *           eg. 0a0a0a0a0b0b0b0b
         // *           means there are two methods: ['0a0a0a0a', '0b0b0b0b']
         // *      8 bytes: expire block height
         // *      20 bytes: main key
-        // *           eg. 388C818CA8B9251b393131C08a736A67ccB19297 
+        // *           eg. 388C818CA8B9251b393131C08a736A67ccB19297
 
         if (encodeKey.length == 0) {
             return {
