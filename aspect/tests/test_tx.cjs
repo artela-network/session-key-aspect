@@ -179,6 +179,8 @@ async function f() {
         chainId
     }
 
+    console.log('binding data:', eoaBindingData);
+
     signedTx = await web3.eth.accounts.signTransaction(tx, account.privateKey);
     receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
     console.log(`binding EoA result:`);

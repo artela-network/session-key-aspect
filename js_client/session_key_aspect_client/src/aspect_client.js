@@ -204,14 +204,15 @@ class SessionKeyAspectClient {
         let metamaskTx = {
             from: walletAddress,
             to: this.aspectCore.options.address,
-            value: "0x00",
+            // value: "0x00",
             gas: "0x" + gas.toString(16),
             data: eoaBindingData,
-            nonce: 0
+            // nonce: 0
         }
 
         console.log("metamaskTx:", metamaskTx);
         let txHash = await this.web3.eth.sendTransaction(metamaskTx);
+        console.log("txHash:", txHash);
 
         return txHash;
     }
