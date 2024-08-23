@@ -71,7 +71,7 @@ class SessionKeyAspectClient {
         return tx;
     }
 
-    async createUnsignTx(walletAddress, sKeyPrivKey, contractCallData, toAddress, value= '') {
+    async createUnsignTx(walletAddress, sKeyPrivKey, contractCallData, toAddress, value= 0) {
         let sKeyAccount = this.web3.eth.accounts.privateKeyToAccount(sKeyPrivKey);
         let gasPrice = await this.web3.eth.getGasPrice();
         let nonce = await this.web3.eth.getTransactionCount(walletAddress);
@@ -84,7 +84,7 @@ class SessionKeyAspectClient {
             from: sKeyAccount.address,
             nonce: nonce,
             gasPrice,
-            gas: 8000000,
+            gas: gas,
             data: contractCallData,
             to: toAddress,
             chainId,
@@ -118,6 +118,7 @@ class SessionKeyAspectClient {
             to: toAddress,
             chainId: this.toPaddedHexString(chainId),
             gasLimit: this.toPaddedHexString(gasLimit),
+            value: this.toPaddedHexString(value)
         }
 
         return '0x' + this.bytesToHex(EthereumTx.fromTxData(tx).serialize());
