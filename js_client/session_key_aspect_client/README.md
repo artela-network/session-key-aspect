@@ -7,7 +7,7 @@
 ## Installation
 
 ```
-npm install session-key-aspect-client
+npm install @artela/session-key-aspect-client
 ```
 
 

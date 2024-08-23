@@ -71,7 +71,7 @@ class SessionKeyAspectClient {
         return tx;
     }
 
-    async createUnsignTx(walletAddress, sKeyPrivKey, contractCallData, toAddress) {
+    async createUnsignTx(walletAddress, sKeyPrivKey, contractCallData, toAddress, value= '') {
         let sKeyAccount = this.web3.eth.accounts.privateKeyToAccount(sKeyPrivKey);
         let gasPrice = await this.web3.eth.getGasPrice();
         let nonce = await this.web3.eth.getTransactionCount(walletAddress);
@@ -88,7 +88,8 @@ class SessionKeyAspectClient {
             data: contractCallData,
             to: toAddress,
             chainId,
-            gasLimit: gasLimit
+            gasLimit: gasLimit,
+            value: value ? value : 0
         }
 
         let signedTx = await this.web3.eth.accounts.signTransaction(tx, sKeyPrivKey);
