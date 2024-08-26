@@ -2,9 +2,9 @@
 
 //todo modify it
 
-const Web3 = require('@artela/web3');
+const Web3 = require('@artela-next/web3');
 const fs = require("fs");
-const { numberToHex } = require("@artela/web3-utils");
+const { numberToHex } = require("@artela-next/web3-utils");
 const BigNumber = require('bignumber.js');
 
 const contractBin = fs.readFileSync('./build/contract/Counter.bin', "utf-8");

@@ -9,9 +9,11 @@ import {
     stringToUint8Array,
     sys,
     TxVerifyInput,
+    InitInput,
     uint8ArrayToHex,
     UintData,
-} from "@artela/aspect-libs";
+    Uint256
+} from "@artela-next/aspect-libs";
 
 import {Protobuf} from "as-proto/assembly/Protobuf";
 
@@ -61,8 +63,8 @@ export class Aspect implements IAspectOperation, ITransactionVerifier {
         const unsignedHash = Protobuf.decode<BytesData>(rawUnsignedHash, BytesData.decode);
         const msgHash = this.rmPrefix(uint8ArrayToHex(unsignedHash.data));
 
-        const recoverResult = sys.hostApi.crypto.ecRecover(msgHash, BigInt.fromString(v, 16), BigInt.fromString(r, 16), BigInt.fromString(s, 16));
-        const ret = hexToUint8Array(recoverResult);
+        const recoverResult = sys.hostApi.crypto.ecRecover(hexToUint8Array(msgHash), Uint256.fromHex(v), Uint256.fromHex(r), Uint256.fromHex(s));
+        const ret = recoverResult;
         const sKey = uint8ArrayToHex(ret.subarray(12, 32));
         sys.require(sKey != "", "illegal signature, verify fail");
 
@@ -306,7 +308,7 @@ export class Aspect implements IAspectOperation, ITransactionVerifier {
         const s = params.slice(208, 272);
         const v = params.slice(272, 274);
 
-        return this.ecRecover_(hash, r, s, v);
+        return uint8ArrayToHex(this.ecRecover_(hash, r, s, v));
     }
 
     verifySessionKeyScope_(from: string, to: string, method: string, signer: string): bool {
@@ -327,11 +329,11 @@ export class Aspect implements IAspectOperation, ITransactionVerifier {
             + r
             + s;
 
-        const sKey = sys.hostApi.crypto.ecRecover(hash, BigInt.fromString(v, 16), BigInt.fromString(r, 16), BigInt.fromString(s, 16));
+        const sKey = sys.hostApi.crypto.ecRecover(hexToUint8Array(hash), Uint256.fromHex(v), Uint256.fromHex(r), Uint256.fromHex(s));
 
-        sys.require(sKey != "", "illegal signature, verify fail");
+        sys.require(sKey.length > 0, "illegal signature, verify fail");
 
-        const ret = hexToUint8Array(sKey);
+        const ret = sKey;
         const signer = uint8ArrayToHex(ret.subarray(12, 32));
         if (signer == "") {
             return false;
@@ -346,11 +348,11 @@ export class Aspect implements IAspectOperation, ITransactionVerifier {
         return true;
     }
 
-    ecRecover_(hash: string, r: string, s: string, v: string): string {
+    ecRecover_(hash: string, r: string, s: string, v: string): Uint8Array {
 
         //[msgHash 32B][v 32B][r 32B][s 32B]
 
-        return sys.hostApi.crypto.ecRecover(hash, BigInt.fromString(v, 16), BigInt.fromString(r, 16), BigInt.fromString(s, 16));
+        return sys.hostApi.crypto.ecRecover(hexToUint8Array(hash), Uint256.fromHex(v), Uint256.fromHex(r), Uint256.fromHex(s));
 
     }
 
@@ -358,6 +360,9 @@ export class Aspect implements IAspectOperation, ITransactionVerifier {
     // base Aspect api
     // ***********************************
     isOwner(sender: Uint8Array): bool { return true; }
+
+    init(input: InitInput): void {
+    }
 
 }
 
